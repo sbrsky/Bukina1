@@ -10,7 +10,10 @@
   },
   "auth": {
     "providers": {
-      "emailPassword": true
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "Joiner",
+        "supportEmail": "a.sipkevics@gmail.com"
+      }
     }
   },
   "hosting": {

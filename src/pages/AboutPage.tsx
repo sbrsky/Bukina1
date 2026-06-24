@@ -1,6 +1,27 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import { GraduationCap, Award, CheckCircle2 } from "lucide-react";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../lib/firebase";
+
+interface AboutData {
+  name: string;
+  title: string;
+  regNumber: string;
+  text: string;
+  text2: string;
+  imageUrl: string;
+}
+
+const defaults: AboutData = {
+  name: "Анастасия Букина",
+  title: "Косметолог",
+  regNumber: "59850068090",
+  text: "Я — Анастасия Букина, косметолог с высшим медицинским образованием Латвийского Университета по специальности медицинская сестра.",
+  text2: "В моей практике косметология — это не просто процедуры, а глубокий медицинский анализ. Я убеждена, что истинный результат достижим лишь тогда, когда мы смотрим на проблему комплексно, учитывая внутренние и внешние факторы. Моя миссия — опираясь на знания, помочь каждой женщине не только выглядеть безупречно, но и обрести внутреннюю уверенность и гармонию.",
+  imageUrl: "https://storage.googleapis.com/aida-uploads/default/20260408-073123.jpeg",
+};
 
 const features = [
   {
@@ -21,39 +42,55 @@ const features = [
 ];
 
 export default function AboutPage() {
+  const [data, setData] = useState<AboutData>(defaults);
+
+  useEffect(() => {
+    getDoc(doc(db, "content", "about"))
+      .then((snap) => {
+        if (snap.exists()) {
+          const d = snap.data();
+          setData({
+            name: d.name || defaults.name,
+            title: d.title || defaults.title,
+            regNumber: d.regNumber || defaults.regNumber,
+            text: d.text || defaults.text,
+            text2: d.text2 || defaults.text2,
+            imageUrl: d.imageUrl || defaults.imageUrl,
+          });
+        }
+      })
+      .catch(console.error);
+  }, []);
+
   return (
     <div className="min-h-screen pt-12">
       {/* Hero Section */}
       <section className="px-6 sm:px-12 lg:px-40 py-12 lg:py-20">
         <div className="max-w-[1200px] mx-auto grid lg:grid-cols-2 gap-12 items-center">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             className="flex flex-col gap-6"
           >
             <div>
               <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider mb-4">
-                Косметолог
+                {data.title}
               </span>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 mb-2">
-                Анастасия Букина
+                {data.name}
               </h1>
               <p className="text-sm text-slate-500 font-medium">
-                Регистрационный номер: 59850068090
+                Регистрационный номер: {data.regNumber}
               </p>
             </div>
 
             <div className="space-y-6 text-slate-600 leading-relaxed text-lg">
-              <p>
-                Я — Анастасия Букина, косметолог с высшим медицинским образованием Латвийского Университета по специальности медицинская сестра.
-              </p>
-              <p>
-                В моей практике косметология — это не просто процедуры, а глубокий медицинский анализ. Я убеждена, что истинный результат достижим лишь тогда, когда мы смотрим на проблему комплексно, учитывая внутренние и внешние факторы. Моя миссия — опираясь на знания, помочь каждой женщине не только выглядеть безупречно, но и обрести внутреннюю уверенность и гармонию.
-              </p>
+              <p>{data.text}</p>
+              <p>{data.text2}</p>
             </div>
 
             <div className="flex flex-wrap gap-4 mt-4">
-              <Link 
+              <Link
                 to="/booking"
                 className="h-12 px-8 bg-primary text-white font-bold rounded-lg hover:brightness-95 transition-all shadow-lg shadow-primary/20 flex items-center justify-center"
               >
@@ -65,15 +102,15 @@ export default function AboutPage() {
             </div>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             className="relative"
           >
             <div className="aspect-[4/5] rounded-[32px] overflow-hidden shadow-2xl">
-              <img 
-                src="https://storage.googleapis.com/aida-uploads/default/20260408-073123.jpeg" 
-                alt="Анастасия Букина"
+              <img
+                src={data.imageUrl}
+                alt={data.name}
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"
               />
@@ -94,7 +131,7 @@ export default function AboutPage() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {features.map((f, i) => (
-              <motion.div 
+              <motion.div
                 key={f.title}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}

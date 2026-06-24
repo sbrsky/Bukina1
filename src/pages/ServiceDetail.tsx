@@ -1,46 +1,84 @@
 import { useParams, Link, useLocation } from "react-router-dom";
-import { servicesData, Treatment } from "../data/servicesData";
+import { useServices } from "../hooks/useServices";
 import { motion, AnimatePresence } from "motion/react";
 import { ArrowLeft, Calendar, X, Info, Target, Activity, ImageIcon } from "lucide-react";
 import { useEffect, useState, useMemo } from "react";
+import * as LucideIcons from "lucide-react";
+import { useT } from "../hooks/useT";
+import { useLang } from "../context/LangContext";
+
+interface Treatment {
+  name: string;
+  description: string;
+  price: string;
+  indications?: string[];
+  results?: string[];
+  detailedDescription?: string;
+  image?: string;
+  [key: string]: any; // allow _lang suffixed lookups
+}
 
 export default function ServiceDetail() {
   const { id } = useParams<{ id: string }>();
   const { search } = useLocation();
-  const service = servicesData.find((s) => s.id === id);
+  const { services, loading } = useServices();
+  const t = useT();
+  const { lang } = useLang();
+  const service = services.find((s) => s.id === id);
   const [selectedTreatment, setSelectedTreatment] = useState<Treatment | null>(null);
 
   const queryParams = useMemo(() => new URLSearchParams(search), [search]);
 
+  // Resolve a field from a service/treatment object respecting current language
+  function fl(obj: any, field: string, fallback = ''): string {
+    if (!obj) return fallback;
+    if (lang !== 'ru') {
+      const localized = obj[`${field}_${lang}`];
+      if (localized) return localized;
+    }
+    return obj[field] ?? fallback;
+  }
+
   useEffect(() => {
     if (service) {
-      document.title = service.seoTitle;
+      document.title = fl(service, 'seoTitle') || fl(service, 'title') + " | SKINLAB";
       
       const treatmentName = queryParams.get("treatment");
-      if (treatmentName) {
-        const treatment = service.treatments.find(t => t.name === treatmentName);
+      if (treatmentName && service.treatments) {
+        const treatment = service.treatments.find((t: any) => 
+          t.name === treatmentName || fl(t, 'name') === treatmentName
+        ) as Treatment | undefined;
         if (treatment) {
           setSelectedTreatment(treatment);
         }
       }
     }
     window.scrollTo(0, 0);
-  }, [service, queryParams]);
+  }, [service, queryParams, lang]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#fdfdfb]">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   if (!service) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#fdfdfb]">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-slate-900 mb-4">Услуга не найдена</h1>
+          <h1 className="text-4xl font-bold text-slate-900 mb-4">{t('serviceDetail.notFound')}</h1>
           <Link to="/" className="text-primary hover:underline flex items-center justify-center gap-2">
-            <ArrowLeft size={20} /> Вернуться на главную
+            <ArrowLeft size={20} /> {t('serviceDetail.backHome')}
           </Link>
         </div>
       </div>
     );
   }
 
-  const Icon = service.icon;
+  const IconComp = (LucideIcons as any)[service.iconName || 'Sparkles'] || LucideIcons.Sparkles;
+  const treatments = (service.treatments || []) as Treatment[];
 
   return (
     <div className="min-h-screen bg-[#fdfdfb] text-slate-900 selection:bg-primary/20">
@@ -56,7 +94,7 @@ export default function ServiceDetail() {
             className="inline-flex items-center gap-2 text-slate-400 hover:text-primary transition-colors mb-12 group"
           >
             <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-            <span className="text-sm font-bold uppercase tracking-widest">Все услуги</span>
+            <span className="text-sm font-bold uppercase tracking-widest">{t('serviceDetail.allServices')}</span>
           </Link>
 
           <div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-24 items-center">
@@ -66,13 +104,13 @@ export default function ServiceDetail() {
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             >
               <div className="w-16 h-16 rounded-3xl bg-primary/10 flex items-center justify-center text-primary mb-8 shadow-sm">
-                <Icon size={32} />
+                <IconComp size={32} />
               </div>
               <h1 className="text-5xl lg:text-7xl font-bold leading-[1.1] mb-8 text-slate-900">
-                {service.title}
+                {fl(service, 'title')}
               </h1>
               <p className="text-xl text-slate-500 leading-relaxed mb-10 max-w-xl">
-                {service.description}
+                {fl(service, 'description')}
               </p>
               <div className="flex flex-wrap gap-4">
                 <a 
@@ -80,7 +118,7 @@ export default function ServiceDetail() {
                   className="inline-flex items-center gap-3 bg-slate-900 text-white px-10 py-5 rounded-full font-bold hover:bg-primary transition-all shadow-xl hover:shadow-primary/20"
                 >
                   <Calendar size={20} />
-                  Смотреть цены
+                  {t('serviceDetail.viewPrices')}
                 </a>
               </div>
             </motion.div>
@@ -93,8 +131,8 @@ export default function ServiceDetail() {
             >
               <div className="aspect-[4/5] rounded-[32px] sm:rounded-[48px] overflow-hidden shadow-2xl border-8 border-white">
                 <img 
-                  src={`https://picsum.photos/seed/${service.id}/1000/1250`} 
-                  alt={service.title}
+                  src={service.image || `https://picsum.photos/seed/${service.id}/1000/1250`} 
+                  alt={fl(service, 'title')}
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000"
                   referrerPolicy="no-referrer"
                 />
@@ -108,13 +146,13 @@ export default function ServiceDetail() {
       <section className="py-20 lg:py-32 px-6 sm:px-12 lg:px-40" id="booking">
         <div className="max-w-[1200px] mx-auto">
           <div className="mb-20 text-center">
-            <span className="text-primary font-bold uppercase tracking-[0.2em] text-xs mb-4 block">Прайс-лист</span>
-            <h2 className="text-4xl lg:text-5xl font-bold mb-6">Процедуры и стоимость</h2>
+            <span className="text-primary font-bold uppercase tracking-[0.2em] text-xs mb-4 block">{t('serviceDetail.priceList')}</span>
+            <h2 className="text-4xl lg:text-5xl font-bold mb-6">{t('serviceDetail.proceduresAndPrices')}</h2>
             <div className="w-24 h-1 bg-primary mx-auto rounded-full" />
           </div>
 
           <div className="grid gap-8">
-            {service.treatments.map((treatment, index) => (
+            {treatments.map((treatment, index) => (
               <motion.div
                 key={treatment.name}
                 initial={{ opacity: 0, y: 20 }}
@@ -125,23 +163,23 @@ export default function ServiceDetail() {
               >
                 <div className="flex-1">
                   <h3 className="text-xl lg:text-2xl font-bold mb-3 group-hover:text-primary transition-colors break-words">
-                    {treatment.name}
+                    {fl(treatment, 'name')}
                   </h3>
                   <p className="text-slate-500 text-lg leading-relaxed max-w-2xl mb-4">
-                    {treatment.description}
+                    {fl(treatment, 'description')}
                   </p>
                   <button
                     onClick={() => setSelectedTreatment(treatment)}
                     className="text-primary text-sm font-bold flex items-center gap-2 hover:gap-3 transition-all group/btn"
                   >
                     <Info size={16} />
-                    Подробнее
+                    {t('serviceDetail.details')}
                   </button>
                 </div>
                 
                 <div className="flex flex-col sm:flex-row items-center gap-8 lg:gap-12">
                   <div className="text-center sm:text-right">
-                    <span className="text-xs text-slate-400 uppercase tracking-[0.2em] block mb-2">Стоимость</span>
+                    <span className="text-xs text-slate-400 uppercase tracking-[0.2em] block mb-2">{t('serviceDetail.price')}</span>
                     <span className="text-xl font-bold text-slate-900">{treatment.price}</span>
                   </div>
                   
@@ -149,7 +187,7 @@ export default function ServiceDetail() {
                     to="/booking"
                     className="w-full sm:w-auto bg-primary text-white px-8 py-4 rounded-xl font-bold hover:bg-slate-900 transition-all shadow-lg hover:shadow-primary/20 text-center text-sm"
                   >
-                    Записаться
+                    {t('serviceDetail.book')}
                   </Link>
                 </div>
               </motion.div>
@@ -180,7 +218,7 @@ export default function ServiceDetail() {
               <div className="p-8 sm:p-12 pb-4 flex items-start justify-between">
                 <div>
                   <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">
-                    {selectedTreatment.name}
+                    {fl(selectedTreatment, 'name')}
                   </h3>
                   <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-bold">
                     {selectedTreatment.price}
@@ -198,14 +236,14 @@ export default function ServiceDetail() {
               <div className="px-8 sm:p-12 pt-4 overflow-y-auto custom-scrollbar pb-12">
                 <div className="space-y-10">
                   {/* Detailed Description */}
-                  {selectedTreatment.detailedDescription && (
+                  {fl(selectedTreatment, 'detailedDescription') && (
                     <div>
                       <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400 mb-4 flex items-center gap-2">
                         <Info size={14} className="text-primary" />
-                        О процедуре
+                        {t('serviceDetail.about')}
                       </h4>
                       <p className="text-slate-600 leading-relaxed text-lg">
-                        {selectedTreatment.detailedDescription}
+                        {fl(selectedTreatment, 'detailedDescription')}
                       </p>
                     </div>
                   )}
@@ -215,7 +253,7 @@ export default function ServiceDetail() {
                     <div>
                       <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400 mb-4 flex items-center gap-2">
                         <Target size={14} className="text-primary" />
-                        Показания
+                        {t('serviceDetail.indications')}
                       </h4>
                       <ul className="grid sm:grid-cols-2 gap-3">
                         {selectedTreatment.indications.map((item, i) => (
@@ -233,7 +271,7 @@ export default function ServiceDetail() {
                     <div>
                       <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400 mb-4 flex items-center gap-2">
                         <Activity size={14} className="text-primary" />
-                        Результат
+                        {t('serviceDetail.results')}
                       </h4>
                       <ul className="grid sm:grid-cols-2 gap-3">
                         {selectedTreatment.results.map((item, i) => (
@@ -246,40 +284,16 @@ export default function ServiceDetail() {
                     </div>
                   )}
 
-                  {/* Before/After Photos */}
-                  {selectedTreatment.beforeAfter && selectedTreatment.beforeAfter.length > 0 && (
+                  {/* Photo */}
+                  {selectedTreatment.image && (
                     <div>
-                      <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400 mb-6 flex items-center gap-2">
-                        <ImageIcon size={14} className="text-primary" />
-                        Результаты: До и После
-                      </h4>
-                      <div className="space-y-8">
-                        {selectedTreatment.beforeAfter.map((item, i) => (
-                          <div key={i} className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 block text-center">До</span>
-                              <div className="aspect-[3/4] rounded-2xl overflow-hidden border border-slate-100 shadow-sm">
-                                <img 
-                                  src={item.before} 
-                                  alt="До" 
-                                  className="w-full h-full object-cover"
-                                  referrerPolicy="no-referrer"
-                                />
-                              </div>
-                            </div>
-                            <div className="space-y-2">
-                              <span className="text-[10px] font-bold uppercase tracking-widest text-primary block text-center">После</span>
-                              <div className="aspect-[3/4] rounded-2xl overflow-hidden border-2 border-primary/20 shadow-lg">
-                                <img 
-                                  src={item.after} 
-                                  alt="После" 
-                                  className="w-full h-full object-cover"
-                                  referrerPolicy="no-referrer"
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        ))}
+                      <div className="aspect-[4/3] sm:aspect-video rounded-3xl overflow-hidden border border-slate-100 shadow-[0_12px_40px_rgba(0,0,0,0.06)] mt-8">
+                         <img
+                           src={selectedTreatment.image}
+                           alt={fl(selectedTreatment, 'name')}
+                           className="w-full h-full object-cover object-center"
+                           referrerPolicy="no-referrer"
+                         />
                       </div>
                     </div>
                   )}
@@ -292,7 +306,7 @@ export default function ServiceDetail() {
                     className="w-full bg-slate-900 text-white py-5 rounded-2xl font-bold hover:bg-primary transition-all shadow-xl flex items-center justify-center gap-3"
                   >
                     <Calendar size={20} />
-                    Записаться на процедуру
+                    {t('serviceDetail.bookProcedure')}
                   </Link>
                 </div>
               </div>

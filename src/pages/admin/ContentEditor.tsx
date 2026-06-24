@@ -1,9 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import ImageUploader from '../../components/admin/ImageUploader';
 import { motion } from 'motion/react';
-import { Save, Plus, Trash2, ChevronDown, ChevronUp, Eye, Languages } from 'lucide-react';
+import { Save, Plus, Trash2, ChevronDown, ChevronUp, Eye, Languages, Globe } from 'lucide-react';
+
+// Language label map for UI
+const LANG_LABELS: Record<string, string> = {
+  ru: '🇷🇺 RU',
+  lv: '🇱🇻 LV',
+  en: '🇬🇧 EN',
+  uk: '🇺🇦 UK',
+  lt: '🇱🇹 LT',
+  et: '🇪🇪 ET',
+  es: '🇪🇸 ES',
+};
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -11,11 +22,23 @@ interface HeroSlide {
   id: string;
   title: string;
   title_lv?: string;
+  title_en?: string;
+  title_uk?: string;
+  title_lt?: string;
+  title_et?: string;
+  title_es?: string;
   treatment: string;
   treatment_lv?: string;
+  treatment_en?: string;
   description: string;
   description_lv?: string;
+  description_en?: string;
+  description_uk?: string;
+  description_lt?: string;
+  description_et?: string;
+  description_es?: string;
   image: string;
+  [key: string]: any; // allow dynamic _lang field access
 }
 
 interface AboutContent {
@@ -54,11 +77,12 @@ interface CtaContent {
 interface NavItem {
   name: string;
   href: string;
+  translations?: Record<string, string>; // { lv: 'Sākums', en: 'Home', ... }
 }
 
 interface HeaderContent {
   navItems: NavItem[];
-  navItems_lv?: NavItem[];
+  navItems_lv?: NavItem[]; // legacy – kept for backward compat on load
   bookingButtonText: string;
   bookingButtonText_lv?: string;
   bookingButtonTextMobile: string;
@@ -146,6 +170,11 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
+const inputClass =
+  'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-primary/50 focus:bg-white/8 transition-all text-sm';
+
+const textareaClass = inputClass + ' resize-none leading-relaxed';
+
 /** Dual-language text field with RU/LV inputs */
 function LangField({ 
   label, 
@@ -204,10 +233,57 @@ function LangField({
   );
 }
 
-const inputClass =
-  'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-primary/50 focus:bg-white/8 transition-all text-sm';
-
-const textareaClass = inputClass + ' resize-none leading-relaxed';
+/** Multi-language field - shows input for each enabled language */
+function MultiLangField({
+  label,
+  baseValue,
+  onBaseChange,
+  getTranslation,
+  onTranslationChange,
+  enabledLangs,
+  multiline = false,
+  rows = 3,
+  placeholder,
+}: {
+  label: string;
+  baseValue: string;
+  onBaseChange: (v: string) => void;
+  getTranslation: (lang: string) => string;
+  onTranslationChange: (lang: string, v: string) => void;
+  enabledLangs: string[];
+  multiline?: boolean;
+  rows?: number;
+  placeholder?: string;
+}) {
+  const transLangs = enabledLangs.filter(l => l !== 'ru');
+  return (
+    <div className="flex flex-col gap-2">
+      <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">{label}</label>
+      <div className="flex flex-col gap-1.5">
+        {/* RU base field */}
+        <div className="relative">
+          <span className="absolute right-3 top-3 text-[10px] font-bold text-slate-500 uppercase pointer-events-none">RU</span>
+          {multiline ? (
+            <textarea rows={rows} className={textareaClass + ' pr-10'} value={baseValue} onChange={(e) => onBaseChange(e.target.value)} placeholder={placeholder} />
+          ) : (
+            <input className={inputClass + ' pr-10'} value={baseValue} onChange={(e) => onBaseChange(e.target.value)} placeholder={placeholder} />
+          )}
+        </div>
+        {/* Language-specific fields */}
+        {transLangs.map(lang => (
+          <div key={lang} className="relative">
+            <span className="absolute right-3 top-3 text-[10px] font-bold text-emerald-500/60 uppercase pointer-events-none">{lang.toUpperCase()}</span>
+            {multiline ? (
+              <textarea rows={rows} className={textareaClass + ' pr-10 border-emerald-500/20'} value={getTranslation(lang)} onChange={(e) => onTranslationChange(lang, e.target.value)} placeholder={`${placeholder || label} (${LANG_LABELS[lang] || lang})`} />
+            ) : (
+              <input className={inputClass + ' pr-10 border-emerald-500/20'} value={getTranslation(lang)} onChange={(e) => onTranslationChange(lang, e.target.value)} placeholder={`${placeholder || label} (${LANG_LABELS[lang] || lang})`} />
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
@@ -216,6 +292,23 @@ export default function ContentEditor() {
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState('');
   const [showLv, setShowLv] = useState(false);
+  const [enabledLangs, setEnabledLangs] = useState<string[]>(['ru', 'lv']);
+
+  // Subscribe to enabled languages from Firestore settings
+  useEffect(() => {
+    const unsub = onSnapshot(doc(db, 'settings', 'site'), (snap) => {
+      if (snap.exists()) {
+        const d = snap.data();
+        if (d.enabledLanguages && Array.isArray(d.enabledLanguages)) {
+          setEnabledLangs(d.enabledLanguages);
+        }
+      }
+    });
+    return unsub;
+  }, []);
+
+  // Non-RU enabled languages for translation fields
+  const transLangs = enabledLangs.filter(l => l !== 'ru');
 
   // Unified site content state
   const [siteContent, setSiteContent] = useState<Record<TabId, ContentSection>>({
@@ -451,13 +544,13 @@ export default function ContentEditor() {
       {activeTab === 'hero' && (
         <div className="flex flex-col gap-4">
           <div className="bg-white/3 border border-white/8 rounded-2xl p-6">
-            <LangField
+            <MultiLangField
               label="Главный заголовок блока Hero"
-              value={heroMainTitle}
-              valueLv={heroMainTitle_lv}
-              onChange={setHeroMainTitle}
-              onChangeLv={setHeroMainTitleLv}
-              showLv={showLv}
+              baseValue={heroMainTitle}
+              onBaseChange={setHeroMainTitle}
+              getTranslation={(lang) => siteContent.hero[`mainTitle_${lang}`] || ''}
+              onTranslationChange={(lang, v) => updateSection('hero', { [`mainTitle_${lang}`]: v })}
+              enabledLangs={enabledLangs}
               placeholder="Заголовок для всего слайдера..."
             />
           </div>
@@ -475,29 +568,29 @@ export default function ContentEditor() {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="flex flex-col gap-4">
-                  <LangField
+                  <MultiLangField
                     label="Заголовок"
-                    value={slide.title}
-                    valueLv={slide.title_lv}
-                    onChange={(v) => setHeroSlides((prev) => prev.map((s, idx) => idx === i ? { ...s, title: v } : s))}
-                    onChangeLv={(v) => setHeroSlides((prev) => prev.map((s, idx) => idx === i ? { ...s, title_lv: v } : s))}
-                    showLv={showLv}
+                    baseValue={slide.title}
+                    onBaseChange={(v) => setHeroSlides((prev) => prev.map((s, idx) => idx === i ? { ...s, title: v } : s))}
+                    getTranslation={(lang) => slide[`title_${lang}`] || ''}
+                    onTranslationChange={(lang, v) => setHeroSlides((prev) => prev.map((s, idx) => idx === i ? { ...s, [`title_${lang}`]: v } : s))}
+                    enabledLangs={enabledLangs}
                   />
-                  <LangField
+                  <MultiLangField
                     label="Название процедуры"
-                    value={slide.treatment}
-                    valueLv={slide.treatment_lv}
-                    onChange={(v) => setHeroSlides((prev) => prev.map((s, idx) => idx === i ? { ...s, treatment: v } : s))}
-                    onChangeLv={(v) => setHeroSlides((prev) => prev.map((s, idx) => idx === i ? { ...s, treatment_lv: v } : s))}
-                    showLv={showLv}
+                    baseValue={slide.treatment}
+                    onBaseChange={(v) => setHeroSlides((prev) => prev.map((s, idx) => idx === i ? { ...s, treatment: v } : s))}
+                    getTranslation={(lang) => slide[`treatment_${lang}`] || ''}
+                    onTranslationChange={(lang, v) => setHeroSlides((prev) => prev.map((s, idx) => idx === i ? { ...s, [`treatment_${lang}`]: v } : s))}
+                    enabledLangs={enabledLangs}
                   />
-                  <LangField
+                  <MultiLangField
                     label="Описание"
-                    value={slide.description}
-                    valueLv={slide.description_lv}
-                    onChange={(v) => setHeroSlides((prev) => prev.map((s, idx) => idx === i ? { ...s, description: v } : s))}
-                    onChangeLv={(v) => setHeroSlides((prev) => prev.map((s, idx) => idx === i ? { ...s, description_lv: v } : s))}
-                    showLv={showLv}
+                    baseValue={slide.description}
+                    onBaseChange={(v) => setHeroSlides((prev) => prev.map((s, idx) => idx === i ? { ...s, description: v } : s))}
+                    getTranslation={(lang) => slide[`description_${lang}`] || ''}
+                    onTranslationChange={(lang, v) => setHeroSlides((prev) => prev.map((s, idx) => idx === i ? { ...s, [`description_${lang}`]: v } : s))}
+                    enabledLangs={enabledLangs}
                     multiline
                     rows={3}
                   />
@@ -714,76 +807,85 @@ export default function ContentEditor() {
             <LangField label="Текст кнопки записи (мобильная)" value={header.bookingButtonTextMobile} valueLv={header.bookingButtonTextMobile_lv} onChange={(v) => setHeader({ ...header, bookingButtonTextMobile: v })} onChangeLv={(v) => setHeader({ ...header, bookingButtonTextMobile_lv: v })} showLv={showLv} placeholder="Записаться онлайн" />
           </div>
 
+          {/* Nav items with per-language inline translations */}
           <div className="bg-white/3 border border-white/8 rounded-2xl p-6">
             <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">Пункты навигации (RU)</span>
+              <div className="flex items-center gap-2">
+                <Globe size={14} className="text-slate-400" />
+                <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">Пункты навигации</span>
+              </div>
               <button
-                onClick={() => setHeader({ ...header, navItems: [...header.navItems, { name: '', href: '/' }] })}
+                onClick={() => setHeader({ ...header, navItems: [...header.navItems, { name: '', href: '/', translations: {} }] })}
                 className="text-primary text-xs hover:underline flex items-center gap-1"
               >
-                <Plus size={12} /> Добавить
+                <Plus size={12} /> Добавить пункт
               </button>
             </div>
-            <div className="flex flex-col gap-3">
+
+            {/* Active languages hint */}
+            {transLangs.length > 0 && (
+              <div className="flex items-center gap-2 mb-4 p-3 bg-emerald-500/5 border border-emerald-500/15 rounded-xl">
+                <Languages size={13} className="text-emerald-400 shrink-0" />
+                <span className="text-emerald-400/80 text-xs">
+                  Активные языки перевода: {transLangs.map(l => LANG_LABELS[l] || l.toUpperCase()).join(', ')}. Заполните поля для каждого языка.
+                </span>
+              </div>
+            )}
+
+            <div className="flex flex-col gap-4">
               {header.navItems.map((item, i) => (
-                <div key={i} className="flex gap-3 items-center">
-                  <input
-                    placeholder="Название"
-                    className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-primary/50 focus:bg-white/8 transition-all text-sm"
-                    value={item.name}
-                    onChange={(e) => setHeader({ ...header, navItems: header.navItems.map((n, idx) => idx === i ? { ...n, name: e.target.value } : n) })}
-                  />
-                  <input
-                    placeholder="/path"
-                    className="w-40 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-primary/50 focus:bg-white/8 transition-all text-sm"
-                    value={item.href}
-                    onChange={(e) => setHeader({ ...header, navItems: header.navItems.map((n, idx) => idx === i ? { ...n, href: e.target.value } : n) })}
-                  />
-                  <button onClick={() => setHeader({ ...header, navItems: header.navItems.filter((_, idx) => idx !== i) })} className="text-slate-500 hover:text-red-400">
-                    <Trash2 size={16} />
-                  </button>
+                <div key={i} className="border border-white/8 rounded-xl p-4 flex flex-col gap-3">
+                  {/* RU name + href */}
+                  <div className="flex gap-3 items-center">
+                    <div className="relative flex-1">
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-500 uppercase">RU</span>
+                      <input
+                        placeholder="Название (RU)"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 pr-10 text-white placeholder:text-slate-600 focus:outline-none focus:border-primary/50 text-sm"
+                        value={item.name}
+                        onChange={(e) => setHeader({ ...header, navItems: header.navItems.map((n, idx) => idx === i ? { ...n, name: e.target.value } : n) })}
+                      />
+                    </div>
+                    <input
+                      placeholder="/path"
+                      className="w-36 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder:text-slate-600 focus:outline-none focus:border-primary/50 text-sm"
+                      value={item.href}
+                      onChange={(e) => setHeader({ ...header, navItems: header.navItems.map((n, idx) => idx === i ? { ...n, href: e.target.value } : n) })}
+                    />
+                    <button onClick={() => setHeader({ ...header, navItems: header.navItems.filter((_, idx) => idx !== i) })} className="text-slate-500 hover:text-red-400 flex-shrink-0">
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+
+                  {/* Per-language translations — ALWAYS visible (not gated by showLv) */}
+                  {transLangs.length === 0 && (
+                    <p className="text-slate-600 text-xs">Нет активных языков перевода. Добавьте языки в настройках сайта.</p>
+                  )}
+                  {transLangs.map(lang => (
+                    <div key={lang} className="relative">
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-emerald-500/70 uppercase">{LANG_LABELS[lang] || lang.toUpperCase()}</span>
+                      <input
+                        placeholder={`Название на ${LANG_LABELS[lang] || lang} (обязательно)`}
+                        className="w-full bg-white/5 border border-emerald-500/20 rounded-xl px-4 py-2.5 pr-16 text-white placeholder:text-slate-600 focus:outline-none focus:border-emerald-500/50 text-sm"
+                        value={item.translations?.[lang] || ''}
+                        onChange={(e) => setHeader({
+                          ...header,
+                          navItems: header.navItems.map((n, idx) =>
+                            idx === i ? { ...n, translations: { ...(n.translations || {}), [lang]: e.target.value } } : n
+                          )
+                        })}
+                      />
+                    </div>
+                  ))}
                 </div>
               ))}
             </div>
           </div>
 
-          {showLv && (
-            <div className="bg-white/3 border border-emerald-500/15 rounded-2xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-medium text-emerald-500/60 uppercase tracking-wider">Пункты навигации (LV)</span>
-                <button
-                  onClick={() => setHeader({ ...header, navItems_lv: [...(header.navItems_lv || []), { name: '', href: '/' }] })}
-                  className="text-emerald-400 text-xs hover:underline flex items-center gap-1"
-                >
-                  <Plus size={12} /> Добавить
-                </button>
-              </div>
-              <div className="flex flex-col gap-3">
-                {(header.navItems_lv || []).map((item, i) => (
-                  <div key={i} className="flex gap-3 items-center">
-                    <input
-                      placeholder="Nosaukums"
-                      className="flex-1 bg-white/5 border border-emerald-500/20 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-primary/50 focus:bg-white/8 transition-all text-sm"
-                      value={item.name}
-                      onChange={(e) => setHeader({ ...header, navItems_lv: (header.navItems_lv || []).map((n, idx) => idx === i ? { ...n, name: e.target.value } : n) })}
-                    />
-                    <input
-                      placeholder="/path"
-                      className="w-40 bg-white/5 border border-emerald-500/20 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-primary/50 focus:bg-white/8 transition-all text-sm"
-                      value={item.href}
-                      onChange={(e) => setHeader({ ...header, navItems_lv: (header.navItems_lv || []).map((n, idx) => idx === i ? { ...n, href: e.target.value } : n) })}
-                    />
-                    <button onClick={() => setHeader({ ...header, navItems_lv: (header.navItems_lv || []).filter((_, idx) => idx !== i) })} className="text-slate-500 hover:text-red-400">
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
           <p className="text-slate-500 text-xs px-1">* Пункт «Услуги» автоматически показывает выпадающее меню с категориями услуг.</p>
         </div>
       )}
+
 
       {/* ── SERVICES SECTION ── */}
       {activeTab === 'services_section' && (

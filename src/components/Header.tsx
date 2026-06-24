@@ -4,13 +4,13 @@ import { useState, useRef, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useServices } from "../hooks/useServices";
 import { useContent } from "../hooks/useContent";
-import { useLang } from "../context/LangContext";
+import { useLang, LangCode } from "../context/LangContext";
 import { useCmsField, useT } from "../hooks/useT";
 import * as LucideIcons from "lucide-react";
 
 interface HeaderCmsData {
-  navItems: { name: string; name_lv?: string; href: string }[];
-  navItems_lv?: { name: string; href: string }[];
+  navItems: { name: string; href: string; translations?: Record<string, string> }[];
+  navItems_lv?: { name: string; href: string }[]; // legacy
   bookingButtonText: string;
   bookingButtonText_lv?: string;
   bookingButtonTextMobile: string;
@@ -28,12 +28,17 @@ const defaultHeaderData: HeaderCmsData = {
   bookingButtonTextMobile: "Записаться онлайн",
 };
 
-// Map nav item names to static translation keys for lang resolution
-const navTranslationMap: Record<string, string> = {
+// Map common Russian nav names to static translation keys (fallback only)
+// Used when CMS nav items don't have inline translations stored
+const NAV_STATIC_KEYS: Record<string, string> = {
   "Главная": "nav.home",
   "Обучение": "nav.training",
   "Магазин": "nav.shop",
   "Услуги": "nav.services",
+  "Наши работы": "nav.works",
+  "О нас": "nav.about",
+  "Контакты": "nav.contacts",
+  "Блог": "nav.blog",
 };
 
 export default function Header() {
@@ -75,25 +80,38 @@ export default function Header() {
   };
 
   // Build navLinks from CMS data, marking the services link for dropdown
-  const navLinks = (cms.navItems || defaultHeaderData.navItems).map((item, index) => {
-    // If we have parallel arrays in CMS
-    const lvItem = cms.navItems_lv?.[index];
-    const resolvedNameLv = lvItem?.name || item.name_lv || '';
-    
-    // Resolve translated name
-    let resolvedName = item.name;
-    if (lang === 'lv') {
-      if (resolvedNameLv) {
-        resolvedName = resolvedNameLv;
-      } else if (navTranslationMap[item.name]) {
-        resolvedName = t(navTranslationMap[item.name]);
+  const navLinks = (cms.navItems || defaultHeaderData.navItems).map((item) => {
+    let resolvedName = item.name; // RU default
+
+    if (lang !== 'ru') {
+      // 1. Inline CMS translation (most reliable)
+      const inlineTranslation = item.translations?.[lang];
+      if (inlineTranslation) {
+        resolvedName = inlineTranslation;
+      }
+      // 2. Legacy LV array fallback
+      else if (lang === 'lv') {
+        const legacyLvItems = cms.navItems_lv || [];
+        const legacyIdx = (cms.navItems || []).indexOf(item);
+        const lvItem = legacyLvItems[legacyIdx];
+        if (lvItem?.name) resolvedName = lvItem.name;
+        else {
+          // 3. Static translations by common Russian names
+          const staticKey = NAV_STATIC_KEYS[item.name];
+          if (staticKey) resolvedName = t(staticKey);
+        }
+      }
+      // 3. Static translations for any lang (EN, UK, LT, ET, ES)
+      else {
+        const staticKey = NAV_STATIC_KEYS[item.name];
+        if (staticKey) resolvedName = t(staticKey);
       }
     }
-    
+
     return {
       ...item,
       resolvedName: resolvedName || item.name,
-      hasDropdown: item.href === "/services",
+      hasDropdown: item.href === '/services',
     };
   });
   return (
@@ -168,8 +186,16 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-3">
-          {/* Language Switcher */}
-          <div ref={langRef} className="relative">
+          <Link 
+            to="/booking"
+            onClick={() => setIsMenuOpen(false)}
+            className="hidden sm:flex items-center justify-center rounded-full h-11 px-8 bg-primary text-white text-sm font-bold shadow-lg hover:brightness-95 transition-all"
+          >
+            {f(cms, 'bookingButtonText', t('nav.book'))}
+          </Link>
+
+          {/* Language Switcher — hidden on mobile, visible sm+ */}
+          <div ref={langRef} className="relative hidden sm:block">
             <button
               onClick={() => setIsLangOpen(!isLangOpen)}
               className="flex items-center gap-1.5 h-10 px-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-100 transition-all"
@@ -213,14 +239,6 @@ export default function Header() {
               )}
             </AnimatePresence>
           </div>
-
-          <Link 
-            to="/booking"
-            onClick={() => setIsMenuOpen(false)}
-            className="hidden sm:flex items-center justify-center rounded-full h-11 px-8 bg-primary text-white text-sm font-bold shadow-lg hover:brightness-95 transition-all"
-          >
-            {f(cms, 'bookingButtonText', t('nav.book'))}
-          </Link>
           
           <button 
             className="md:hidden text-slate-800 w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50"
@@ -229,6 +247,7 @@ export default function Header() {
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
+
       </div>
 
       {/* Mobile Nav */}
