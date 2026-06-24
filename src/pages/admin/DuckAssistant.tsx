@@ -396,8 +396,8 @@ export default function DuckAssistant() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [tipText, setTipText] = useState(tips[0]);
 
-  const inactivityTimer = useRef<ReturnType<typeof setTimeout>>();
-  const tipCycleTimer = useRef<ReturnType<typeof setInterval>>();
+  const inactivityTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const tipCycleTimer = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
 
   // Reset inactivity
   const resetInactivity = useCallback(() => {
