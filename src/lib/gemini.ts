@@ -1,12 +1,8 @@
 /**
- * gemini.ts — Kria the Duck AI assistant, powered by Gemini.
- * Streaming chat with admin context injection.
+ * gemini.ts — Kria the Duck AI assistant.
+ * Streaming chat via Lovable Cloud edge function (key stays server-side).
  */
-import { GoogleGenAI } from '@google/genai';
-
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY as string;
-
-const ai = new GoogleGenAI({ apiKey: API_KEY });
+import { supabase } from '../integrations/supabase/client';
 
 export interface AdminSnapshot {
   currentPage: string;
@@ -16,31 +12,12 @@ export interface AdminSnapshot {
   todaySlotsAvailable: number;
 }
 
-const DUCK_SYSTEM_PROMPT = (ctx: AdminSnapshot) => `
-Ты — Кря, пиксельная уточка-ассистент в admin-панели эстетической клиники SKINLAB.
-Твоя задача — помогать администратору управлять клиникой: бронированиями, слотами, контентом сайта, настройками.
-
-Текущий контекст:
-- Страница: ${ctx.currentPage}
-- Ожидающих подтверждения заявок: ${ctx.pendingBookings}
-- Бронирований на сегодня: ${ctx.todayBookings}
-- Всего бронирований: ${ctx.totalBookings}
-- Доступных слотов на сегодня: ${ctx.todaySlotsAvailable}
-
-Правила общения:
-1. Отвечай КОРОТКО и по делу — 2-4 предложения максимум.
-2. Используй русский язык.
-3. Иногда (не всегда!) заканчивай фразу словом "Кря!" — это твоя фишка.
-4. Будь дружелюбной, тёплой, чуть игривой, но профессиональной.
-5. Если администратор спрашивает о данных — используй цифры из контекста.
-6. Если что-то не знаешь — честно скажи, что это вне твоих данных.
-7. Никогда не выдумывай данные о клиентах, услугах или конкретных записях.
-`;
-
 export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
 }
+
+const FUNCTION_URL = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/duck-chat`;
 
 /**
  * Send a message and get a streaming response.
@@ -55,31 +32,49 @@ export async function sendDuckMessage(
   onError: (err: string) => void
 ): Promise<void> {
   try {
-    // Build contents array for Gemini
-    const contents = [
-      ...history.map((m) => ({
-        role: m.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: m.content }],
-      })),
-      {
-        role: 'user' as const,
-        parts: [{ text: userMessage }],
-      },
-    ];
+    const { data: { session } } = await supabase.auth.getSession();
+    const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
-    const response = await ai.models.generateContentStream({
-      model: 'gemini-3.1-flash-lite-preview',
-      config: {
-        systemInstruction: DUCK_SYSTEM_PROMPT(context),
-        temperature: 0.75,
-        maxOutputTokens: 256,
+    const resp = await fetch(FUNCTION_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session?.access_token ?? anonKey}`,
+        apikey: anonKey,
       },
-      contents,
+      body: JSON.stringify({ history, userMessage, context }),
     });
 
-    for await (const chunk of response) {
-      const text = chunk.text;
-      if (text) onChunk(text);
+    if (!resp.ok || !resp.body) {
+      if (resp.status === 429) return onError('Кря! Слишком много запросов. Подожди немного.');
+      if (resp.status === 402) return onError('Кря! Закончились кредиты на ИИ. Пополни баланс в настройках.');
+      return onError('Кря! Что-то пошло не так. Попробуй ещё раз.');
+    }
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      let nl: number;
+      while ((nl = buffer.indexOf('\n')) !== -1) {
+        const line = buffer.slice(0, nl).trim();
+        buffer = buffer.slice(nl + 1);
+        if (!line.startsWith('data:')) continue;
+        const payload = line.slice(5).trim();
+        if (payload === '[DONE]') continue;
+        try {
+          const json = JSON.parse(payload);
+          const text = json.choices?.[0]?.delta?.content;
+          if (text) onChunk(text);
+        } catch {
+          /* ignore parse errors on keep-alive chunks */
+        }
+      }
     }
 
     onDone();
