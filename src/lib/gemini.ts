@@ -2,7 +2,7 @@
  * gemini.ts — Kria the Duck AI assistant.
  * Streaming chat via Lovable Cloud edge function (key stays server-side).
  */
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '../integrations/supabase/client';
 
 export interface AdminSnapshot {
   currentPage: string;
