@@ -1,5 +1,9 @@
 // Duck (Kria) AI proxy — streams Gemini through Lovable AI Gateway.
-import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+// @ts-nocheck
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
 
 interface AdminSnapshot {
   currentPage: string;
