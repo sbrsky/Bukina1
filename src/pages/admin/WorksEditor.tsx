@@ -118,7 +118,7 @@ export default function WorksEditor() {
         order: works.length + 1,
       };
       await setDoc(doc(db, 'works', id), newWork);
-      const fullWork = { id, ...newWork };
+      const fullWork = { id, ...newWork } as FirestoreWork;
       setWorks((prev) => [...prev, fullWork]);
       setShowNewForm(false);
       setNewWorkId('');
