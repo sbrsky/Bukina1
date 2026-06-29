@@ -192,7 +192,7 @@ export default function Hero() {
                         overflow: 'hidden',
                       }}
                     >
-                      {f(service, 'title')}
+                      {service.title}
                     </h3>
                     <p
                       className="text-slate-500 text-xs sm:text-sm leading-snug"
