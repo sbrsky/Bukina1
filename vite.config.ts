@@ -31,11 +31,6 @@ export default defineConfig(({ mode }) => {
               id.includes('node_modules/@firebase')
             ) return 'vendor-firebase';
 
-            // Google Genai SDK — separate, only Admin panel needs it
-            if (
-              id.includes('node_modules/@google/genai') ||
-              id.includes('node_modules/@google-cloud')
-            ) return 'vendor-genai';
 
             // Framer Motion / motion
             if (
