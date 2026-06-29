@@ -203,13 +203,13 @@ export default function Hero() {
                         overflow: 'hidden',
                       }}
                     >
-                      {f(service, 'description')}
+                      {service.description}
                     </p>
                   </div>
 
                   {/* CTA — always at bottom */}
                   <Link
-                    to={`/service/${service.id}`}
+                    to={`/service/${service.serviceId}`}
                     className="inline-flex items-center gap-1.5 text-primary font-bold text-sm group/link"
                   >
                     <span>{detailBtnText}</span>
