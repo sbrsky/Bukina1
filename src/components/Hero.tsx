@@ -58,12 +58,66 @@ export default function Hero() {
     );
   }
 
-  const heroServices = services
-    .filter(s => s.showInHero)
-    .sort((a, b) => (a.heroOrder ?? 99) - (b.heroOrder ?? 99));
+  // ── Featured procedures shown in the Hero slider ──
+  const slides: Array<{
+    id: string;
+    serviceId: string;
+    title: string;
+    description: string;
+    image: string;
+    iconName: string;
+  }> = [
+    {
+      id: "plinest-pdrn",
+      serviceId: "biostimulation",
+      title: "ПДРН (Plinest)",
+      description: "Революция в омоложении: глубокое восстановление структуры кожи и активация собственных ресурсов.",
+      image: "https://picsum.photos/seed/plinest-pdrn/800/600",
+      iconName: "Sparkles",
+    },
+    {
+      id: "lip-biorevitalization",
+      serviceId: "biorevitalization",
+      title: "Биоревитализация губ",
+      description: "Глубокое увлажнение и естественная сочность губ без лишнего объёма.",
+      image: "https://picsum.photos/seed/lip-biorevit/800/600",
+      iconName: "Droplets",
+    },
+    {
+      id: "meso-xanthin",
+      serviceId: "biostimulation",
+      title: "Meso-Xanthin F199",
+      description: "Глянцевое сияние и безупречный тон. Защита от фотостарения и стресса.",
+      image: "https://picsum.photos/seed/meso-xanthin/800/600",
+      iconName: "Sparkles",
+    },
+    {
+      id: "anti-acne",
+      serviceId: "skincare",
+      title: "Anti Acne",
+      description: "Авторская программа для проблемной кожи: чистота, здоровье и индивидуальный план.",
+      image: "https://picsum.photos/seed/anti-acne/800/600",
+      iconName: "Smile",
+    },
+    {
+      id: "rrs-ha-eyes",
+      serviceId: "mesotherapy",
+      title: "RRS HA Eyes",
+      description: "Коктейль для зоны вокруг глаз: уменьшает темные круги, отёки и мелкие морщинки.",
+      image: "https://picsum.photos/seed/rrs-ha-eyes/800/600",
+      iconName: "Syringe",
+    },
+    {
+      id: "meso-eye-c71",
+      serviceId: "mesotherapy",
+      title: "Meso Eye C71",
+      description: "Премиальный коктейль для периорбитальной зоны: дренаж, осветление и лифтинг взгляда.",
+      image: "https://picsum.photos/seed/meso-eye-c71/800/600",
+      iconName: "Syringe",
+    },
+  ];
 
-  const slides = heroServices.length > 0 ? heroServices : services.slice(0, 4);
-  if (!slides.length) return null;
+  void services; // services still loaded for potential future linking
 
   return (
     <section className="px-6 sm:px-12 lg:px-40 py-12 bg-white">
