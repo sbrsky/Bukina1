@@ -1,0 +1,167 @@
+/* Colophon (footer) — DESIGN.md §5.11. PAGE-B-owned. Oat; prefix .v2-colo__ */
+
+.v2 .v2-colo {
+  position: relative;
+  overflow: clip; /* crops the wordmark at the bottom edge (and keeps x clipped) */
+  background: var(--v2-oat);
+  padding: calc(var(--v2-beat) * 3) var(--v2-edge) env(safe-area-inset-bottom);
+  color: var(--v2-ink);
+}
+.v2 .v2-colo__grid {
+  row-gap: calc(var(--v2-beat) * 1.2);
+  align-items: start;
+}
+.v2 .v2-colo__label {
+  margin-bottom: 0.9rem;
+  color: var(--v2-ink);
+}
+.v2 .v2-colo__about,
+.v2 .v2-colo__nav,
+.v2 .v2-colo__base {
+  grid-column: 1 / -1;
+}
+.v2 .v2-colo__desc {
+  white-space: pre-line;
+  max-width: 40ch;
+  min-height: 4.5em;
+}
+.v2 .v2-colo__sched {
+  margin-top: 1.4rem;
+}
+.v2 .v2-colo__sched .v2-kicker {
+  margin-bottom: 0.3rem;
+  color: var(--v2-ink-60);
+}
+.v2 .v2-colo__nav ul {
+  display: grid;
+}
+.v2 .v2-colo__link {
+  font-family: var(--v2-font-mono);
+  font-size: var(--v2-fs-mono);
+  font-weight: 450;
+  font-stretch: 87.5%;
+  letter-spacing: 0.02em;
+  line-height: 1.35;
+  background-position: 0 calc(100% - 9px);
+}
+
+.v2 .v2-colo__base {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--v2-hair);
+}
+.v2 .v2-colo__copy {
+  font-family: var(--v2-font-mono);
+  font-size: var(--v2-fs-mono);
+  font-weight: 450;
+  font-stretch: 87.5%;
+  letter-spacing: 0.02em;
+  color: var(--v2-ink-60);
+}
+.v2 .v2-colo__langs {
+  display: flex;
+  align-items: center;
+}
+.v2 .v2-colo__langwrap {
+  display: inline-flex;
+  align-items: center;
+}
+.v2 .v2-colo__sep {
+  color: var(--v2-ink-60);
+  padding-inline: 0.1rem;
+}
+.v2 .v2-colo__lang {
+  position: relative;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 0.4rem;
+  font-family: var(--v2-font-mono);
+  font-size: var(--v2-fs-mono);
+  font-weight: 500;
+  font-stretch: 87.5%;
+  letter-spacing: 0.1em;
+  color: var(--v2-ink);
+  border-radius: var(--v2-r-pill);
+}
+.v2 .v2-colo__lang.is-on {
+  color: var(--v2-rouge);
+}
+.v2 .v2-colo__lang:not(.is-on):hover {
+  color: var(--v2-rouge);
+}
+.v2 .v2-colo__under {
+  position: absolute;
+  left: 0.55rem;
+  bottom: 9px;
+  width: calc(100% - 1.1rem) !important;
+}
+
+/* the giant wordmark, cropped by the bottom edge; the tiny rouge dot after it */
+.v2 .v2-colo__mark {
+  --colo-fs: max(4rem, calc((100vw - 2 * var(--v2-edge)) / 3.75));
+  grid-column: 1 / -1;
+  margin: calc(var(--v2-beat) * 1.4) 0 calc(var(--colo-fs) * -0.075);
+  font-family: var(--v2-font-display);
+  font-synthesis: none;
+  font-size: var(--colo-fs);
+  font-weight: 600;
+  font-stretch: 62.5%;
+  line-height: 0.78;
+  letter-spacing: -0.012em;
+  white-space: nowrap;
+  color: var(--v2-ink);
+  user-select: none;
+}
+.v2 .v2-colo__dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-left: 0.05em;
+  border-radius: 50%;
+  background: var(--v2-rouge);
+  vertical-align: 0.16em; /* sits just above the cropped bottom edge */
+}
+
+@media (min-width: 768px) {
+  .v2 .v2-colo__about {
+    grid-column: 1 / span 4;
+  }
+  .v2 .v2-colo__nav {
+    grid-column: 5 / span 4;
+  }
+  .v2 .v2-colo__mark {
+    --colo-fs: min(13rem, calc((100vw - 2 * var(--v2-edge)) / 3.7));
+  }
+}
+
+@media (min-width: 1280px) {
+  .v2 .v2-colo__grid {
+    grid-template-rows: auto 1fr;
+  }
+  .v2 .v2-colo__mark {
+    --mark-w: calc(var(--v2-col-w) * 6 + var(--v2-gutter) * 5);
+    --colo-fs: min(clamp(4rem, 14vw, 13rem), calc(var(--mark-w) / 3.66));
+    grid-column: 1 / span 6;
+    grid-row: 1 / span 2;
+    align-self: end;
+    margin-top: 0;
+  }
+  .v2 .v2-colo__about {
+    grid-column: 7 / span 3;
+    grid-row: 1;
+  }
+  .v2 .v2-colo__nav {
+    grid-column: 10 / span 3;
+    grid-row: 1;
+  }
+  .v2 .v2-colo__base {
+    grid-column: 7 / span 6;
+    grid-row: 2;
+    align-self: end;
+    margin-bottom: calc(var(--v2-beat) * 1.4);
+  }
+}

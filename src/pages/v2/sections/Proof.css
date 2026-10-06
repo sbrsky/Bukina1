@@ -1,0 +1,252 @@
+/* Proof «Работы» — DESIGN.md §5.6. PAGE-B-owned. Oat band; prefix .v2-proof__ */
+
+.v2 .v2-proof {
+  background: var(--v2-oat);
+}
+.v2 .v2-proof__grid {
+  row-gap: calc(var(--v2-beat) * 1.25);
+  align-items: start;
+}
+
+/* header */
+.v2 .v2-proof__head {
+  --span: var(--v2-cols);
+  --text-w: calc(var(--v2-col-w) * var(--span) + var(--v2-gutter) * (var(--span) - 1));
+  grid-column: 1 / -1;
+}
+.v2 .v2-proof__head .v2-kicker {
+  margin-bottom: calc(var(--v2-beat) * 0.6);
+}
+.v2 .v2-proof__h {
+  font-size: min(var(--v2-fs-dl), calc(var(--text-w) / (var(--chars, 12) * 0.56)));
+}
+.v2 .v2-proof__h .v2-line--italic {
+  padding-left: 0.6em; /* authored second line steps in (staircase) */
+}
+
+/* the slider print — the giant element */
+.v2 .v2-proof__print {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+.v2 .v2-proof__illu {
+  position: absolute;
+  z-index: 3;
+  top: 24px;
+  left: 24px;
+  pointer-events: none;
+  box-shadow: var(--v2-shadow-slip);
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.v2 .v2-proof__stage {
+  position: relative;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--v2-blush);
+  cursor: ew-resize;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.v2 .v2-proof__layer {
+  position: absolute;
+  inset: 0;
+}
+.v2 .v2-proof__layer img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+.v2 .v2-proof__handle {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.v2 .v2-proof__line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -4px;
+  width: 8px;
+  height: 100%;
+  overflow: visible;
+}
+.v2 .v2-proof__line path {
+  fill: none;
+  stroke: var(--v2-rouge);
+  stroke-width: 2.5px;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.v2 .v2-proof__knob {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -22px;
+  width: 44px;
+  pointer-events: auto;
+  border-radius: var(--v2-r-pill);
+  outline: none;
+}
+.v2 .v2-proof__knob:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--v2-paper), inset 0 0 0 4px var(--v2-rouge);
+}
+.v2 .v2-proof__lab {
+  position: absolute;
+  top: 50%;
+  translate: 0 -50%;
+  padding: 0.25em 0.55em;
+  border-radius: var(--v2-r-slip);
+  background: var(--v2-paper);
+  box-shadow: var(--v2-shadow-slip);
+  color: var(--v2-ink);
+  font-family: var(--v2-font-mono);
+  font-size: var(--v2-fs-mono);
+  font-weight: 500;
+  font-stretch: 87.5%;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+}
+/* «до» left of the pencil line, «после» right of it (before → after, left → right) */
+.v2 .v2-proof__lab--before {
+  right: calc(50% + 12px);
+}
+.v2 .v2-proof__lab--after {
+  left: calc(50% + 12px);
+}
+/* the honesty caption under the print — a paper slip, like the film's text */
+.v2 .v2-proof__caption {
+  position: absolute;
+  z-index: 3;
+  right: 18px;
+  bottom: -16px;
+  font-family: var(--v2-font-mono);
+  font-size: var(--v2-fs-mono);
+  font-weight: 450;
+  font-stretch: 87.5%;
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+  color: var(--v2-ink);
+  max-width: calc(100% - 36px);
+}
+
+/* real works — small tilted prints */
+.v2 .v2-proof__works {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: calc(var(--v2-beat) * 0.9) var(--v2-gutter);
+  align-items: start;
+}
+.v2 .v2-proof__work:nth-child(2) {
+  margin-top: calc(var(--v2-beat) * 1);
+}
+.v2 .v2-proof__work:nth-child(3) {
+  margin-left: 8%;
+}
+.v2 .v2-proof__workprint {
+  padding: 8px;
+  margin: 0 0 0.75rem;
+}
+.v2 .v2-proof__mat {
+  aspect-ratio: 4 / 5;
+  background: var(--v2-oat); /* the photo's ground until it decodes — never a blank paper mat */
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+.v2 .v2-proof__mat img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity var(--v2-d2) var(--v2-ease-out-soft);
+}
+.v2 .v2-proof__mat[data-loaded] img {
+  opacity: 1;
+}
+.v2 .v2-proof__wtitle {
+  font-family: var(--v2-font-text);
+  font-size: var(--v2-fs-small);
+  font-weight: 600;
+  line-height: 1.3;
+}
+.v2 .v2-proof__wtag {
+  margin-top: 0.2rem;
+}
+.v2 .v2-proof__more {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 768px) {
+  .v2 .v2-proof__head {
+    --span: 5;
+    grid-column: 1 / span 5;
+  }
+  .v2 .v2-proof__print {
+    grid-column: 2 / span 7;
+  }
+  .v2 .v2-proof__works {
+    grid-column: 1 / span 7;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .v2 .v2-proof__work:nth-child(3) {
+    margin-left: 0;
+    margin-top: calc(var(--v2-beat) * 0.5);
+  }
+}
+
+@media (min-width: 1024px) {
+  .v2 .v2-proof__grid {
+    grid-template-rows: auto auto 1fr;
+  }
+  .v2 .v2-proof__head {
+    --span: 3;
+    grid-column: 1 / span 3;
+    grid-row: 1;
+  }
+  .v2 .v2-proof__print {
+    grid-column: 4 / span 5;
+    grid-row: 1 / span 3;
+    margin-top: calc(var(--v2-beat) * 1);
+    position: sticky;
+    top: calc(var(--v2-header-h) + var(--v2-beat));
+  }
+  .v2 .v2-proof__works {
+    grid-column: 1 / span 3;
+    grid-row: 2;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .v2 .v2-proof__work:nth-child(3) {
+    margin-left: 22%;
+    margin-top: calc(var(--v2-beat) * -0.5);
+  }
+  .v2 .v2-proof__more {
+    grid-column: 1 / span 3;
+    grid-row: 3;
+  }
+}
+
+@media (min-width: 1280px) {
+  .v2 .v2-proof__head {
+    --span: 4;
+    grid-column: 1 / span 4;
+  }
+  /* cols 6–10, ≤ 800 px: the 460 px forehead crop is never blown up past ≈ 1.2× (review round 2) */
+  .v2 .v2-proof__print {
+    grid-column: 6 / span 5;
+    max-width: 800px;
+  }
+  .v2 .v2-proof__works {
+    grid-column: 1 / span 4;
+  }
+  .v2 .v2-proof__more {
+    grid-column: 1 / span 4;
+  }
+}

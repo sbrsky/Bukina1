@@ -1,0 +1,388 @@
+/* PriceList (DESIGN.md §5.3) — PAGE-A. Contents page of the issue: ledger rows, staircase titles. */
+
+.v2 .v2-prices {
+  contain-intrinsic-size: auto 1400px;
+}
+.v2 .v2-prices__grid > * {
+  grid-column: 1 / -1;
+}
+
+/* rail: horizontal kicker on phones/tablets, vertical spine in col 1 on desktop */
+.v2 .v2-prices__rail {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25em 1.25em;
+  margin-bottom: calc(var(--v2-beat) * 0.75);
+}
+.v2 .v2-prices__kicker {
+  color: var(--v2-ink-60);
+}
+.v2 .v2-prices__sections {
+  font-family: var(--v2-font-mono);
+  font-size: var(--v2-fs-mono);
+  font-weight: 500;
+  font-stretch: 87.5%;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--v2-rouge);
+}
+
+/* headline — the giant element; staircase L→R */
+.v2 .v2-prices__h {
+  margin-bottom: calc(var(--v2-beat) * 2);
+}
+.v2 .v2-prices__hline--2 {
+  margin-inline-start: 10%;
+}
+
+/* ── rows ────────────────────────────────────────────────────────────────────────────────── */
+.v2 .v2-prices__list {
+  position: relative;
+}
+.v2 .v2-prices__list::after {
+  /* closing full-bleed hairline */
+  content: '';
+  position: absolute;
+  left: -100vw;
+  right: -100vw;
+  bottom: 0;
+  border-top: 1px solid var(--v2-hair);
+}
+.v2 .v2-prices__row {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    'num   count price'
+    'title title title'
+    'desc  desc  desc'
+    'tog   tog   tog'
+    'panel panel panel';
+  column-gap: 0.75rem;
+  padding-block: calc(var(--v2-beat) * 0.7) calc(var(--v2-beat) * 0.45);
+}
+.v2 .v2-prices__row::before,
+.v2 .v2-prices__row::after {
+  content: '';
+  position: absolute;
+  left: -100vw;
+  right: -100vw;
+  pointer-events: none;
+}
+.v2 .v2-prices__row::after {
+  /* full-bleed hairline */
+  top: 0;
+  border-top: 1px solid var(--v2-hair);
+}
+.v2 .v2-prices__row::before {
+  /* hover / focus band (pointer-fine only, see below) */
+  top: 0;
+  bottom: 0;
+  background: var(--v2-oat);
+  opacity: 0;
+  z-index: -1;
+  transition: opacity var(--v2-d2) var(--v2-ease-out-soft);
+}
+
+.v2 .v2-prices__num {
+  grid-area: num;
+  font-family: var(--v2-font-mono);
+  font-size: var(--v2-fs-mono);
+  font-weight: 500;
+  font-stretch: 87.5%;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  color: var(--v2-rouge);
+}
+.v2 .v2-prices__title {
+  grid-area: title;
+  margin-top: 0.35em;
+  margin-inline-start: var(--stair, 0%); /* [0, 8 %, 16 %][i % 3] — steps that read as intent */
+  hyphens: manual;
+  overflow-wrap: break-word;
+  text-wrap: balance;
+  transition:
+    translate 400ms var(--v2-ease-out),
+    font-stretch 400ms var(--v2-ease-out);
+}
+.v2 .v2-prices__tlink {
+  color: var(--v2-ink);
+  border-radius: var(--v2-r-slip);
+}
+.v2 .v2-prices__tlink:hover {
+  color: var(--v2-rouge);
+}
+.v2 .v2-prices__desc {
+  grid-area: desc;
+  margin-top: 0.5em;
+  margin-inline-start: var(--stair, 0%);
+  max-width: 46ch;
+  font-family: var(--v2-font-text);
+  font-size: var(--v2-fs-small);
+  line-height: 1.5;
+  color: var(--v2-ink-60);
+  /* authored ≤ 90-character lines: never clamped, never hyphenated (review round 2) */
+  hyphens: manual;
+  -webkit-hyphens: manual;
+  text-wrap: pretty;
+}
+
+/* meta: price, count, toggle — on phones its children join the row grid directly */
+.v2 .v2-prices__meta {
+  display: contents;
+}
+.v2 .v2-prices__from {
+  grid-area: price;
+  justify-self: end;
+  font-size: 16px;
+}
+.v2 .v2-prices__count {
+  grid-area: count;
+  font-family: var(--v2-font-mono);
+  font-size: var(--v2-fs-mono);
+  font-weight: 450;
+  font-stretch: 87.5%;
+  letter-spacing: 0.04em;
+  color: var(--v2-ink-60);
+  white-space: nowrap;
+}
+.v2 .v2-prices__toggle {
+  grid-area: tog;
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  min-height: 44px;
+  margin-top: 0.2em;
+  padding-inline: 0.1em;
+  font-family: var(--v2-font-mono);
+  font-size: var(--v2-fs-mono);
+  font-weight: 500;
+  font-stretch: 87.5%;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--v2-ink);
+  border-radius: var(--v2-r-slip);
+}
+.v2 .v2-prices__toggle:hover {
+  color: var(--v2-rouge);
+}
+.v2 .v2-prices__caret {
+  transition: rotate var(--v2-d2) var(--v2-ease-out);
+}
+.v2 .v2-prices__row[data-open] .v2-prices__caret {
+  rotate: 180deg;
+}
+
+/* thumbnails: desktop only (see ≥ 1280) */
+.v2 .v2-prices__thumb {
+  display: none;
+}
+
+/* ── disclosure panel ───────────────────────────────────────────────────────────────────── */
+.v2 .v2-prices__panel {
+  grid-area: panel;
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--v2-d2) var(--v2-ease-out);
+}
+.v2 .v2-prices__row[data-open] .v2-prices__panel {
+  grid-template-rows: 1fr;
+}
+.v2 .v2-prices__panelclip {
+  min-height: 0;
+  overflow: hidden;
+}
+.v2 .v2-prices__panelbody {
+  padding-block: calc(var(--v2-beat) * 0.3) calc(var(--v2-beat) * 0.6);
+}
+.v2 .v2-prices__items {
+  border-top: 1px dashed var(--v2-hair);
+}
+.v2 .v2-prices__item {
+  font-family: var(--v2-font-text);
+  font-size: 16px;
+  line-height: 1.35;
+  border-bottom: 1px dashed var(--v2-hair);
+}
+.v2 .v2-prices__item .v2-leader__price {
+  font-size: 15px;
+}
+.v2 .v2-prices__more {
+  margin-top: 0.4em;
+}
+
+/* ── tablet 768–1279 (8 cols) ───────────────────────────────────────────────────────────── */
+@media (min-width: 768px) {
+  .v2 .v2-prices__h {
+    grid-column: 1 / span 7;
+  }
+  .v2 .v2-prices__hline--2 {
+    margin-inline-start: calc(var(--v2-col-w) + var(--v2-gutter));
+  }
+  .v2 .v2-prices__list {
+    display: grid;
+    grid-template-columns: subgrid;
+  }
+  .v2 .v2-prices__row {
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+    grid-template-areas: none;
+    grid-template-rows: auto auto auto;
+    align-items: start;
+    min-height: 112px;
+    padding-block: calc(var(--v2-beat) * 0.75);
+  }
+  .v2 .v2-prices__num {
+    grid-column: 1;
+    grid-row: 1;
+    padding-top: 0.9em;
+  }
+  .v2 .v2-prices__title {
+    grid-column: calc(2 + var(--step)) / 7;
+    grid-row: 1;
+    margin: 0;
+  }
+  .v2 .v2-prices__desc {
+    grid-column: calc(2 + var(--step)) / 7;
+    grid-row: 2;
+    margin-inline-start: 0;
+    margin-top: 0.75em;
+  }
+  .v2 .v2-prices__meta {
+    grid-column: 7 / -1;
+    grid-row: 1 / span 2;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: end;
+    gap: 2px;
+    padding-top: 0.55em;
+  }
+  .v2 .v2-prices__toggle {
+    margin-top: 0.25em;
+    margin-inline-end: -0.1em;
+  }
+  .v2 .v2-prices__panel {
+    grid-column: 2 / -1;
+    grid-row: 3;
+  }
+  .v2 .v2-prices__panelbody {
+    max-width: 760px;
+  }
+}
+
+/* ── desktop ≥ 1280 (12 cols) ───────────────────────────────────────────────────────────── */
+@media (min-width: 1280px) {
+  .v2 .v2-prices__grid {
+    grid-template-rows: auto auto;
+  }
+  .v2 .v2-prices__rail {
+    grid-column: 1;
+    grid-row: 1;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+    margin: 0;
+    padding-top: 0.6em;
+  }
+  /* spine labels: exactly ±90° (§4.3) */
+  .v2 .v2-prices__kicker,
+  .v2 .v2-prices__sections {
+    font-size: var(--v2-fs-mono-deco);
+    letter-spacing: 0.14em;
+    writing-mode: vertical-rl;
+    rotate: 180deg;
+    white-space: nowrap;
+  }
+  .v2 .v2-prices__h {
+    grid-column: 2 / span 8;
+    grid-row: 1;
+  }
+  .v2 .v2-prices__list {
+    grid-row: 2;
+  }
+  .v2 .v2-prices__num {
+    grid-column: 2;
+  }
+  .v2 .v2-prices__row {
+    min-height: 112px;
+    padding-block: calc(var(--v2-beat) * 0.6);
+  }
+  .v2 .v2-prices__title {
+    grid-column: calc(3 + var(--step)) / 9;
+  }
+  /* §5.3: the description in cols 9–11, level with the title → a row is ≈ one title tall */
+  .v2 .v2-prices__desc {
+    grid-column: 9 / 12;
+    grid-row: 1 / span 2;
+    margin-top: 0;
+    padding-top: 0.55em;
+    max-width: none;
+  }
+  .v2 .v2-prices__meta {
+    grid-column: 12;
+    padding-top: 0.75em;
+  }
+  .v2 .v2-prices__panel {
+    grid-column: 3 / 12;
+  }
+  .v2 .v2-prices__panelbody {
+    max-width: none;
+    columns: 2;
+    column-gap: calc(var(--v2-gutter) * 3);
+  }
+  .v2 .v2-prices__item {
+    break-inside: avoid;
+  }
+
+  /* the first category's zone print (tiny element: its tape), beside the headline, overlapping the
+     list's top hairline by half a beat — never over a row's text or meta */
+  .v2 .v2-prices__thumb {
+    display: block;
+    grid-column: 10 / span 2;
+    grid-row: 1;
+    justify-self: center;
+    align-self: end;
+    position: relative;
+    z-index: var(--v2-z-overlap);
+    width: min(200px, 100%);
+    margin-bottom: calc(var(--v2-beat) * -0.5);
+    rotate: -2.5deg;
+  }
+  .v2 .v2-prices__thumb picture {
+    aspect-ratio: 1;
+    background: var(--v2-blush);
+  }
+  .v2 .v2-prices__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+/* hover / focus (pointer-fine, ≥ 1024): oat band, title +12 px and wdth 75 → 100 */
+@media (hover: hover) and (pointer: fine) and (min-width: 1024px) {
+  .v2 .v2-prices__row:is(:hover, :focus-within)::before {
+    opacity: 1;
+  }
+  .v2 .v2-prices__row:is(:hover, :focus-within) .v2-prices__title {
+    translate: 12px 0;
+    font-stretch: 100%;
+  }
+}
+
+/* reduced motion (§5.3): no indent, no width change — colour + underline focus states only */
+@media (prefers-reduced-motion: reduce) {
+  .v2 .v2-prices__row:is(:hover, :focus-within) .v2-prices__title {
+    translate: none;
+    font-stretch: 75%;
+  }
+  .v2 .v2-prices__tlink:is(:hover, :focus-visible) {
+    color: var(--v2-rouge);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.12em;
+  }
+}

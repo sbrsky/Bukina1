@@ -1,0 +1,60 @@
+{
+  "$schema": "https://hyperframes.heygen.com/schema/hyperframes.json",
+  "registry": "https://raw.githubusercontent.com/heygen-com/hyperframes/main/registry",
+  "paths": {
+    "blocks": "compositions",
+    "components": "compositions/components",
+    "assets": "assets"
+  },
+  "media": {
+    "autoProxy": true
+  },
+  "authoringSkill": "general-video",
+  "registryItems": [
+    {
+      "name": "svg-mask-reveal",
+      "type": "hyperframes:component",
+      "target": "compositions/components/svg-mask-reveal.html"
+    },
+    {
+      "name": "light-sweep-pass",
+      "type": "hyperframes:component",
+      "target": "compositions/components/light-sweep-pass.html"
+    },
+    {
+      "name": "hw-boil",
+      "type": "hyperframes:component",
+      "target": "compositions/components/hw-boil.html"
+    },
+    {
+      "name": "hw-arrow",
+      "type": "hyperframes:component",
+      "target": "compositions/components/hw-arrow.html"
+    },
+    {
+      "name": "hw-underline",
+      "type": "hyperframes:component",
+      "target": "compositions/components/hw-underline.html"
+    },
+    {
+      "name": "hw-callout-circle",
+      "type": "hyperframes:component",
+      "target": "compositions/components/hw-callout-circle.html"
+    },
+    {
+      "name": "number-wheel",
+      "type": "hyperframes:component",
+      "target": "compositions/components/number-wheel.html"
+    },
+    {
+      "name": "press-ripple",
+      "type": "hyperframes:component",
+      "target": "compositions/components/press-ripple.html"
+    },
+    {
+      "name": "hw-path-text",
+      "type": "hyperframes:block",
+      "target": "compositions/hw-path-text.html"
+    }
+  ]
+}

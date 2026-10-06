@@ -1,0 +1,276 @@
+/* Cover (DESIGN.md §5.2) — PAGE-A. Heavy side right (the film); DOM order = reading order. */
+
+.v2 .v2-cover {
+  /* the film is offset +1 beat from the top; 3 beats below (§4.2) — 1.5 on phones (review round 2) */
+  padding-block: var(--v2-beat) calc(var(--v2-beat) * 1.5);
+}
+@media (min-width: 768px) {
+  .v2 .v2-cover {
+    padding-block-end: calc(var(--v2-beat) * 3);
+  }
+}
+.v2 .v2-cover__grid {
+  align-items: start;
+}
+.v2 .v2-cover__grid > * {
+  grid-column: 1 / -1;
+}
+
+/* spine label — far-left edge, vertical (≥ 768); a horizontal kicker on phones (v2-spine) */
+.v2 .v2-cover__spine {
+  margin: 0 0 calc(var(--v2-beat) * 0.6);
+  white-space: normal;
+}
+@media (min-width: 768px) {
+  .v2 .v2-cover__spine {
+    position: absolute;
+    left: calc(var(--v2-edge) / 2);
+    top: calc(var(--v2-beat) + 0.25em);
+    translate: -50% 0;
+    margin: 0;
+    white-space: nowrap;
+  }
+}
+
+/* ── H1: three authored lines (§4.5) ─────────────────────────────────────────────────────── */
+.v2 .v2-cover__h1 {
+  position: relative;
+  z-index: var(--v2-z-overlap); /* over the film's quiet left gutter */
+  color: var(--v2-ink);
+}
+.v2 .v2-cover__line {
+  /* the reveal mask clips vertically only — an authored line is never cut at its end */
+  overflow: visible clip;
+}
+.v2 .v2-cover__line--2 {
+  margin-inline-start: 10%;
+}
+.v2 .v2-cover__line--3 {
+  margin-inline-start: 4%;
+}
+@media (min-width: 768px) {
+  .v2 .v2-cover__line--2 {
+    margin-inline-start: calc(var(--v2-col-w) + var(--v2-gutter));
+  }
+  .v2 .v2-cover__line--3 {
+    margin-inline-start: 0;
+  }
+}
+
+/* ── trust line + reg. № + signature (tiny element) ──────────────────────────────────────── */
+.v2 .v2-cover__trust {
+  position: relative;
+  margin-top: var(--v2-beat);
+  max-width: 46ch;
+}
+.v2 .v2-cover__trustline {
+  font-family: var(--v2-font-text);
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--v2-ink);
+  hyphens: manual;
+}
+.v2 .v2-cover__reg {
+  margin-top: 0.5em;
+  font-family: var(--v2-font-mono);
+  font-size: var(--v2-fs-mono);
+  font-weight: 450;
+  font-stretch: 87.5%;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: var(--v2-ink-60);
+}
+.v2 .v2-cover__sig {
+  display: block;
+  width: fit-content;
+  margin: 0.15em 0 0 auto;
+  font-size: 28px;
+  rotate: -3deg;
+  translate: -12% 0;
+}
+
+/* ── film ────────────────────────────────────────────────────────────────────────────────── */
+.v2 .v2-cover__film {
+  margin-top: var(--v2-beat);
+  z-index: var(--v2-z-content);
+}
+
+/* ── chapter index, CTAs, slot chip ──────────────────────────────────────────────────────── */
+.v2 .v2-cover__index {
+  margin-top: var(--v2-beat);
+}
+.v2 .v2-cover__cta {
+  margin-top: var(--v2-beat);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+}
+.v2 .v2-cover__pill {
+  min-height: 48px;
+  padding-inline: 1.9em;
+}
+.v2 .v2-cover__all {
+  align-self: center;
+}
+.v2 .v2-cover__slot {
+  margin-top: calc(var(--v2-beat) * 0.5);
+}
+
+@media (min-width: 480px) {
+  .v2 .v2-cover__cta {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 28px;
+  }
+  .v2 .v2-cover__all {
+    align-self: auto;
+  }
+}
+
+/* trust: the phone copy reads before the film, the ≥ 768 copy after it (Cover.tsx) */
+.v2 .v2-cover__trust--wide {
+  display: none;
+}
+@media (min-width: 768px) {
+  .v2 .v2-cover__trust--phone {
+    display: none;
+  }
+  .v2 .v2-cover__trust--wide {
+    display: block;
+  }
+}
+
+/* ── tablet 768–1279 (§5.2): H1 across 8 cols; the film (cols 3–8) rises 1 beat into the H1's
+   short last line «в Риге»; trust, CTAs, chip and the full-width index follow ─────────────── */
+@media (min-width: 768px) {
+  .v2 .v2-cover__h1 {
+    grid-column: 1 / -1;
+  }
+  .v2 .v2-cover__film {
+    grid-column: 3 / -1;
+    justify-self: end;
+    /* cols 3–8 + the right bleed, but never taller than the first screen (landscape tablets) */
+    width: min(
+      calc(100% + var(--v2-edge)),
+      calc((100svh - var(--v2-header-h) - 2 * var(--v2-beat)) * 0.8)
+    );
+    margin-top: calc(-1 * var(--v2-beat));
+    margin-right: calc(-1 * var(--v2-edge));
+  }
+  .v2 .v2-cover__trust--wide {
+    grid-column: 1 / span 6;
+    margin-top: var(--v2-beat);
+  }
+  .v2 .v2-cover__cta,
+  .v2 .v2-cover__slot {
+    grid-column: 1 / span 6;
+  }
+  .v2 .v2-cover__index {
+    grid-column: 1 / -1;
+  }
+  /* the chip is one line from here on: keep its bullet centred on that line */
+  .v2 .v2-cover__slot {
+    margin-top: calc(var(--v2-beat) * 0.4);
+  }
+}
+
+/* ── 1024–1279: the same order, side by side — the film (cols 5–8) rises 1 beat into the H1's
+   short last line, the text column (cols 1–4, ≥ 460 px: every index title on one line) beside it */
+@media (min-width: 1024px) and (max-width: 1279.98px) {
+  .v2 .v2-cover__grid {
+    grid-template-rows: auto auto auto auto auto minmax(0, 1fr);
+  }
+  .v2 .v2-cover__h1 {
+    grid-row: 1;
+  }
+  .v2 .v2-cover__film {
+    grid-column: 5 / -1;
+    grid-row: 2 / -1;
+  }
+  .v2 .v2-cover__trust--wide {
+    grid-column: 1 / span 4;
+    grid-row: 2;
+    padding-inline-end: var(--v2-gutter);
+  }
+  .v2 .v2-cover__cta {
+    grid-column: 1 / span 4;
+    grid-row: 3;
+  }
+  .v2 .v2-cover__slot {
+    grid-column: 1 / span 4;
+    grid-row: 4;
+  }
+  .v2 .v2-cover__index {
+    grid-column: 1 / span 4;
+    grid-row: 5;
+    padding-inline-end: calc(var(--v2-gutter) * 0.5);
+  }
+}
+
+/* ── desktop ≥ 1280: text cols 1–6, film cols 7–12 flush with the right page edge ───────────
+   §5.2 lets the H1 overhang only the film's empty left gutter; the film's own title starts at
+   10.2 % of its width (MOTION.md §4.2) and is set in the same italic at a similar size, so the
+   two would read as one line. Rule: the H1's longest line ends ≥ 1 column (≈ 96 px) left of the
+   film's copy. Hence (in this order, as §5.2 asks): the italic line drops to wdth 62.5, the H1
+   is set at 7.6vw (not 8.4vw), the 8 % pull-left is gone, and the film's width is capped from
+   the same numbers — RU «косметология» at wdth 62.5 is 5.30 em wide and starts 1 col + gutter
+   in, so the film may be at most (100vw − line end − 96 px) / 0.898 wide (LV is narrower). */
+@media (min-width: 1280px) {
+  .v2 .v2-cover {
+    min-height: calc(100svh - var(--v2-header-h));
+  }
+  .v2 .v2-cover__grid {
+    grid-template-rows: auto auto auto auto auto minmax(0, 1fr);
+  }
+  .v2 .v2-cover__h1 {
+    grid-column: 1 / span 7;
+    grid-row: 1;
+    font-size: calc(clamp(3.25rem, 7.6vw, 9.5rem) * var(--v2-h1-k));
+  }
+  .v2 .v2-cover__line--2 .v2-line {
+    font-stretch: 62.5%;
+  }
+  .v2 .v2-cover__trust--wide {
+    grid-column: 1 / span 5;
+    grid-row: 2;
+  }
+  .v2 .v2-cover__cta {
+    grid-column: 1 / span 6;
+    grid-row: 3;
+    margin-top: calc(var(--v2-beat) * 0.9);
+  }
+  .v2 .v2-cover__slot {
+    grid-column: 1 / span 6;
+    grid-row: 4;
+    margin-top: calc(var(--v2-beat) * 0.35);
+  }
+  .v2 .v2-cover__index {
+    grid-column: 1 / span 6;
+    grid-row: 5;
+  }
+  .v2 .v2-cover__film {
+    /* to the page's right edge, also past the 1600 px cap on very wide screens */
+    --bleed: calc(var(--v2-edge) + max(0px, (100vw - 2 * var(--v2-edge) - var(--v2-max)) / 2));
+    grid-column: 7 / -1;
+    grid-row: 1 / -1;
+    justify-self: end;
+    width: min(
+      calc(100% + var(--bleed)),
+      calc((100svh - var(--v2-header-h) - 2 * var(--v2-beat)) * 0.8),
+      calc(53.4vw - 110px),
+      880px
+    );
+    margin-top: 0;
+    margin-right: calc(-1 * var(--bleed));
+  }
+}
+/* ≥ 1600: size the film by width (the height formula left a 612 px box in a 1000 px column);
+   43vw keeps the ≥ 1-column clearance to the H1 up to the 800 px cap */
+@media (min-width: 1600px) {
+  .v2 .v2-cover__film {
+    width: min(calc(100% + var(--bleed)), 43vw, 800px);
+  }
+}

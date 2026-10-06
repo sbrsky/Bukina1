@@ -1,0 +1,145 @@
+/* HeroFilm (DESIGN.md §5.2, §6) — PAGE-A. Size and placement of the figure live in Cover.css;
+   this file only styles the inside of the figure. */
+
+.v2 .v2-film {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    'frame frame'
+    'ctrl  cap';
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 10px;
+  margin: 0;
+}
+
+/* the 4:5 slot: reserves its box before anything loads (no CLS), frameless (paper = film bg) */
+.v2 .v2-film__slot {
+  grid-area: frame;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  isolation: isolate; /* Safari iframe clipping */
+  background: var(--v2-paper);
+  /* static edge feather over the film's 64 px safe band (64/1080 = 6 %, 64/1350 = 4.8 %) */
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0, black 6%, black 94%, transparent 100%),
+    linear-gradient(to bottom, transparent 0, black 4.8%, black 95.2%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent 0, black 6%, black 94%, transparent 100%),
+    linear-gradient(to bottom, transparent 0, black 4.8%, black 95.2%, transparent 100%);
+  mask-composite: intersect;
+}
+
+.v2 .v2-film__poster,
+.v2 .v2-film__poster img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.v2 .v2-film__poster {
+  z-index: 1;
+}
+
+/* <hyperframes-player>, appended by useHeroPlayer */
+.v2 .v2-film__player {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity var(--v2-d1) linear;
+}
+.v2 .v2-film__slot[data-ready] .v2-film__player {
+  opacity: 1;
+}
+.v2 .v2-film__slot[data-ready] .v2-film__poster {
+  visibility: hidden;
+  transition: visibility 0s linear 0.25s;
+}
+
+/* fallback when the poster files are missing: the film's rest state (MOTION.md §4.3 / §4.5 HERO box) */
+.v2 .v2-film__fallback {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.v2 .v2-film__blob {
+  position: absolute;
+  inset: 17.78% 0.93% 3.7% 21.3%;
+  background: var(--v2-blush);
+}
+.v2 .v2-film__face {
+  position: absolute;
+  left: 15.74%;
+  top: 11.11%;
+  width: 92.59%;
+}
+.v2 .v2-film__face img {
+  width: 100%;
+  height: auto;
+}
+.v2 .v2-film__face {
+  -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 86%);
+  mask-image: linear-gradient(to bottom, black 70%, transparent 86%);
+}
+
+/* controls — phone: in the caption row; ≥ 768: inside the frame, bottom-left corner (quiet band) */
+.v2 .v2-film__controls {
+  grid-area: ctrl;
+  display: flex;
+  align-items: center;
+}
+.v2 .v2-film__toggle {
+  box-shadow: 0 6px 16px -6px color-mix(in srgb, var(--v2-plum) 35%, transparent);
+}
+.v2 .v2-film__toggle:hover {
+  background: var(--v2-glaze);
+}
+.v2 .v2-film__watch {
+  box-shadow: var(--v2-shadow-slip);
+}
+
+.v2 .v2-film__caption {
+  grid-area: cap;
+  font-family: var(--v2-font-mono);
+  font-size: var(--v2-fs-mono-deco);
+  font-weight: 450;
+  font-stretch: 87.5%;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.4;
+  color: var(--v2-ink-60);
+}
+
+@media (min-width: 768px) {
+  .v2 .v2-film {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'frame'
+      'cap';
+  }
+  .v2 .v2-film__controls {
+    grid-area: frame;
+    align-self: end;
+    justify-self: start;
+    z-index: 3;
+    margin: 0 0 12px 12px;
+  }
+  .v2 .v2-film__caption {
+    padding-inline-start: 6%; /* align with the visible (feathered) edge of the frame */
+  }
+}
+
+/* keep the focus ring (these controls carry their own shadow) */
+.v2 .v2-film__toggle:focus-visible,
+.v2 .v2-film__watch:focus-visible {
+  box-shadow: var(--v2-focus);
+}

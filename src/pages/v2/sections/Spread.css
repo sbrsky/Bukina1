@@ -1,0 +1,580 @@
+/* Spread A/B/C — DESIGN.md §5.5. PAGE-B-owned. Scoped under .v2, prefix .v2-spread__ */
+
+.v2 .v2-spread {
+  /* em per character of the display face at wdth 80 — used to fit authored lines to their column */
+  --v2-spread-epc: 0.56;
+}
+
+.v2 .v2-spread__grid {
+  row-gap: calc(var(--v2-beat) * 1.6);
+  align-items: start;
+}
+
+/* ── ghost numeral (giant, aria-hidden, blush) ───────────────────────────────────────────── */
+/* phones (review round 2): it used to sit behind the headline and the pull quote («Упругий овал —»
+   ran into the «0» of «05»). Below 768 it lives in the IMAGE band — the section's top corner beside
+   the portrait (A: right, B: left; C: the strip's top right) — at ≤ 45vw, never behind copy. */
+.v2 .v2-spread__ghost {
+  position: absolute;
+  z-index: 0;
+  top: calc(var(--v2-beat) * 0.9);
+  right: -0.04em;
+  font-size: min(45vw, 15rem);
+  white-space: nowrap;
+  will-change: auto;
+}
+@media (max-width: 767.98px) {
+  .v2 .v2-spread--a .v2-spread__text,
+  .v2 .v2-spread--b .v2-spread__text {
+    position: static; /* the ghost is placed against the section (its image band) */
+  }
+  .v2 .v2-spread--b .v2-spread__ghost {
+    right: auto;
+    left: -0.04em;
+  }
+}
+
+/* ── portrait crop in the category token ─────────────────────────────────────────────────── */
+.v2 .v2-spread__portrait {
+  position: relative;
+  z-index: 1;
+  grid-column: 1 / -1;
+  grid-row: 1;
+  width: 86%;
+  margin: 0;
+}
+.v2 .v2-spread--b .v2-spread__portrait {
+  justify-self: end;
+}
+.v2 .v2-spread__mask {
+  aspect-ratio: 4 / 5;
+  background: var(--v2-blush);
+}
+/* the crops are 440 source px wide: never shown wider than 594 px (1.35 × source — review round 2) */
+.v2 .v2-spread--a .v2-spread__portrait,
+.v2 .v2-spread--b .v2-spread__portrait {
+  max-width: 594px;
+}
+.v2 .v2-spread__mask img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.v2 .v2-spread__illu {
+  position: absolute;
+  z-index: 2;
+  left: 3%;
+  bottom: 9%;
+  box-shadow: var(--v2-shadow-slip);
+}
+.v2 .v2-spread--b .v2-spread__illu {
+  left: auto;
+  right: 3%;
+}
+
+/* ── mechanism prints ────────────────────────────────────────────────────────────────────── */
+.v2 .v2-spread__print {
+  position: relative;
+  z-index: 2;
+}
+/* Spread A collage: the lens print is placed against the portrait (never against the text row) */
+.v2 .v2-spread__collage {
+  position: relative;
+  grid-column: 1 / -1;
+  grid-row: 1;
+  align-self: start;
+}
+.v2 .v2-spread__print--a {
+  position: absolute;
+  right: 0;
+  bottom: 0; /* < 1280 the print stays inside the collage box: it never reaches the kicker */
+  width: 54%;
+}
+.v2 .v2-spread__lens {
+  aspect-ratio: 6 / 5;
+  background: var(--v2-oat);
+}
+.v2 .v2-spread__art {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.v2 .v2-spread__print--c {
+  background: var(--v2-oat);
+}
+.v2 .v2-spread__print > .v2-spread__art--clip {
+  height: auto;
+  aspect-ratio: 6 / 5;
+}
+
+/* Spread B: the same print as A (paper border, tape, lens inside — review round 2: one print type)
+   floated in the text column; only the body paragraph wraps it, the lists start below it */
+.v2 .v2-spread__float {
+  position: relative;
+  width: min(64%, 300px);
+  margin: 0 0 calc(var(--v2-beat) * 0.75);
+}
+
+/* ── text column ─────────────────────────────────────────────────────────────────────────── */
+.v2 .v2-spread__text {
+  --span: var(--v2-cols);
+  --text-w: calc(var(--v2-col-w) * var(--span) + var(--v2-gutter) * (var(--span) - 1));
+  position: relative;
+  grid-column: 1 / -1;
+}
+.v2 .v2-spread__text > :not(.v2-spread__ghost),
+.v2 .v2-spread__head > :not(.v2-spread__ghost) {
+  position: relative;
+  z-index: 1;
+}
+.v2 .v2-spread__kicker {
+  margin-bottom: calc(var(--v2-beat) * 0.6);
+  max-width: 34ch;
+}
+/* the kicker on a paper slip, as the film sets its chapter kickers */
+.v2 .v2-spread__kicker.v2-slip {
+  display: table; /* shrink to the text, keep the block flow */
+  padding: 0.4em 0.7em 0.35em;
+  color: var(--v2-ink);
+}
+.v2 .v2-spread--c .v2-spread__kicker.v2-slip {
+  margin-inline: auto;
+}
+.v2 .v2-spread__h {
+  font-size: min(var(--v2-fs-dl), calc(var(--text-w) / (var(--chars, 12) * var(--v2-spread-epc))));
+  margin-bottom: calc(var(--v2-beat) * 0.9);
+}
+.v2 .v2-spread__key {
+  position: relative;
+  display: inline-block;
+}
+.v2 .v2-spread__under {
+  position: absolute;
+  left: 0;
+  bottom: -0.04em;
+}
+/* the B headline's italic line is a paper slip only where it crosses the portrait (≥ 1024) */
+.v2 .v2-spread__slip {
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  rotate: none;
+}
+/* the only on-view width-axis animation on the page (pointer-fine, not reduced motion) */
+.v2 .v2-spread__key.is-swell {
+  font-stretch: 62.5%;
+  transition: font-stretch var(--v2-d5) var(--v2-ease-out);
+}
+.v2 .v2-spread__key.is-swell.is-swollen {
+  font-stretch: 100%;
+}
+
+.v2 .v2-spread__quote {
+  margin: 0 0 calc(var(--v2-beat) * 0.9);
+  max-width: 26ch;
+}
+.v2 .v2-spread__quote p {
+  text-wrap: pretty;
+  hyphens: manual;
+}
+.v2 .v2-spread__cite {
+  display: block;
+  margin-top: 0.9rem;
+  font-style: normal;
+}
+.v2 .v2-spread__body {
+  margin-bottom: calc(var(--v2-beat) * 0.8);
+}
+.v2 .v2-spread__flow {
+  display: flow-root;
+}
+
+/* lists «Показания» / «Результат» */
+.v2 .v2-spread__lists {
+  display: grid;
+  gap: calc(var(--v2-beat) * 0.5) var(--v2-gutter);
+  margin-bottom: calc(var(--v2-beat) * 0.8);
+}
+.v2 .v2-spread__lh {
+  margin-bottom: 0.6rem;
+}
+.v2 .v2-spread__list ul {
+  font-size: var(--v2-fs-ui);
+  font-weight: 400;
+  line-height: 1.45;
+}
+.v2 .v2-spread__list li {
+  padding: 0.28rem 0;
+}
+/* inline marker (not absolutely positioned) so items still read right when they wrap around
+   Spread B's shape-outside float */
+.v2 .v2-spread__list li::before {
+  content: '';
+  display: inline-block;
+  vertical-align: 0.3em;
+  width: 0.65em;
+  height: 2px;
+  margin-right: 0.55em;
+  border-radius: 2px;
+  background: var(--v2-rouge);
+  rotate: -6deg;
+}
+
+/* mobile: «Показания» / «Результат» collapse into <details> (joined hairlines, no gap) */
+.v2 .v2-spread__lists:has(> details) {
+  row-gap: 0;
+}
+.v2 .v2-spread__details {
+  border-top: 1px solid var(--v2-hair);
+}
+.v2 .v2-spread__details:last-child {
+  border-bottom: 1px solid var(--v2-hair);
+}
+.v2 .v2-spread__details summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 48px;
+  margin: 0;
+  cursor: pointer;
+  list-style: none;
+  color: var(--v2-ink);
+}
+.v2 .v2-spread__details summary::-webkit-details-marker {
+  display: none;
+}
+.v2 .v2-spread__details ul {
+  padding-bottom: 0.8rem;
+}
+.v2 .v2-spread__plus {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  fill: none;
+  stroke: var(--v2-rouge);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  transition: rotate var(--v2-d2) var(--v2-ease-out);
+}
+.v2 .v2-spread__details[open] .v2-spread__plus {
+  rotate: 45deg;
+}
+
+/* category price list: name ····· price */
+.v2 .v2-spread__prices {
+  margin-bottom: calc(var(--v2-beat) * 0.5);
+}
+.v2 .v2-spread__prices ul {
+  border-top: 1px solid var(--v2-hair);
+}
+.v2 .v2-spread__prices li {
+  border-bottom: 1px solid var(--v2-hair);
+}
+.v2 .v2-spread__row {
+  font-size: var(--v2-fs-ui);
+  line-height: 1.3;
+  color: var(--v2-ink);
+}
+.v2 .v2-spread__row .v2-leader__price {
+  color: var(--v2-rouge);
+}
+.v2 .v2-spread__row .v2-leader__name {
+  background-image: linear-gradient(var(--v2-rouge), var(--v2-rouge));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1.5px;
+  transition: background-size var(--v2-d2) var(--v2-ease-out);
+}
+.v2 .v2-spread__row:is(:hover, :focus-visible) .v2-leader__name {
+  background-size: 100% 1.5px;
+}
+.v2 .v2-spread__more {
+  margin-top: calc(var(--v2-beat) * 0.4);
+}
+
+/* ── Spread C: centred type break ────────────────────────────────────────────────────────── */
+.v2 .v2-spread--c .v2-spread__head {
+  position: relative;
+  grid-column: 1 / -1;
+  text-align: center;
+}
+.v2 .v2-spread--c .v2-spread__kicker {
+  margin-inline: auto;
+  max-width: none;
+}
+.v2 .v2-spread--c .v2-spread__ghost {
+  right: -0.02em;
+  top: 2.8rem;
+  font-size: min(44vw, 20rem);
+}
+.v2 .v2-spread__h--break {
+  font-size: min(19vw, 14rem, calc(100cqw / (var(--chars, 10) * 0.46)));
+  font-weight: 380;
+  font-stretch: 66%;
+  letter-spacing: -0.03em;
+  line-height: 0.9;
+}
+.v2 .v2-spread--c .v2-spread__quote {
+  margin-inline: auto;
+  max-width: 30ch;
+}
+.v2 .v2-spread__strip {
+  position: relative;
+  grid-column: 1 / -1;
+  margin-bottom: calc(var(--v2-beat) * 1.25);
+}
+/* Spread C (review round 2): the clippings print is the hero, the portrait a small print beside it
+   (the same face had filled four sections at > 40vw) */
+.v2 .v2-spread--c .v2-spread__strip {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+.v2 .v2-spread--c .v2-spread__portrait {
+  width: 44%;
+  flex: none;
+  margin-top: calc(var(--v2-beat) * 1.4);
+}
+.v2 .v2-spread__print--c {
+  position: relative;
+  flex: none;
+  width: 62%;
+  margin-left: -4%; /* the clipping print overlaps the portrait's edge (the section's overlap), clear of the eyes */
+}
+.v2 .v2-spread--c .v2-spread__text {
+  grid-row: auto;
+}
+
+/* ── ≥ 768 (8 cols): stacked, ±1 column drift ────────────────────────────────────────────── */
+@media (min-width: 768px) {
+  .v2 .v2-spread__ghost {
+    font-size: min(40vw, 22rem);
+  }
+  .v2 .v2-spread__h--break {
+    font-size: min(15vw, 14rem, calc(100cqw / (var(--chars, 10) * 0.46)));
+  }
+  /* «Сияние06» read as a suffix (same baseline, same size — review round 2): the ghost is now
+     clearly bigger than the headline (≥ 1.3×), raised and pushed out so it bleeds off the right
+     edge, lighter, behind everything */
+  .v2 .v2-spread--c .v2-spread__ghost {
+    right: -0.16em;
+    top: -0.22em;
+    font-size: min(46vw, 38rem);
+    color: color-mix(in srgb, var(--v2-blush) 62%, var(--v2-paper));
+    z-index: -1;
+  }
+  .v2 .v2-spread--a .v2-spread__collage {
+    grid-column: 1 / span 7;
+  }
+  .v2 .v2-spread--a .v2-spread__portrait {
+    width: calc(var(--v2-col-w) * 5 + var(--v2-gutter) * 4);
+  }
+  .v2 .v2-spread--a .v2-spread__print--a {
+    width: calc(var(--v2-col-w) * 3 + var(--v2-gutter) * 2);
+  }
+  .v2 .v2-spread--a .v2-spread__text {
+    --span: 7;
+    grid-column: 2 / span 7;
+  }
+  /* 768–1023: the print sits inside the portrait's box (bottom right, over the jaw), and the text
+     starts a beat below the collage — the print's border used to cover the kicker's end */
+  .v2 .v2-spread--a .v2-spread__print--a {
+    bottom: calc(var(--v2-beat) * 0.5);
+  }
+  .v2 .v2-spread--a .v2-spread__collage + .v2-spread__text {
+    margin-top: var(--v2-beat);
+  }
+  .v2 .v2-spread--b .v2-spread__portrait {
+    grid-column: 4 / span 5;
+    width: 100%;
+  }
+  .v2 .v2-spread--b .v2-spread__text {
+    --span: 7;
+    grid-column: 1 / span 7;
+  }
+  .v2 .v2-spread__lists {
+    grid-template-columns: 1fr 1fr;
+  }
+  .v2 .v2-spread--c .v2-spread__strip {
+    grid-column: 2 / span 6;
+  }
+  .v2 .v2-spread--c .v2-spread__portrait {
+    width: 36%;
+  }
+  .v2 .v2-spread__print--c {
+    width: 58%;
+  }
+  .v2 .v2-spread--c .v2-spread__text {
+    grid-column: 2 / span 6;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: calc(var(--v2-gutter) * 2);
+  }
+  .v2 .v2-spread--c .v2-spread__lists {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── ≥ 1024: side by side; Spread B wraps its body around the blob print ─────────────────── */
+@media (min-width: 1024px) {
+  .v2 .v2-spread--a .v2-spread__text,
+  .v2 .v2-spread--b .v2-spread__text {
+    position: static; /* ghost numerals are placed against the section edge */
+    align-self: center;
+  }
+  .v2 .v2-spread--a .v2-spread__ghost {
+    left: -0.1em;
+    right: auto;
+    top: calc(var(--v2-beat) * 1.5);
+    font-size: var(--v2-fs-ghost);
+  }
+  .v2 .v2-spread--b .v2-spread__ghost {
+    right: -0.06em;
+    top: calc(var(--v2-beat) * 0.5);
+    font-size: calc(var(--v2-fs-ghost) * 0.82);
+  }
+
+  .v2 .v2-spread--a .v2-spread__collage {
+    grid-column: 1 / span 4;
+  }
+  .v2 .v2-spread--a .v2-spread__portrait {
+    width: 100%;
+  }
+  .v2 .v2-spread--a .v2-spread__print--a {
+    width: calc(var(--v2-col-w) * 2 + var(--v2-gutter));
+    right: calc(var(--v2-gutter) * -0.5); /* stays inside the gutter — never over the body copy */
+  }
+  .v2 .v2-spread--a .v2-spread__text {
+    --span: 4;
+    grid-column: 5 / span 4;
+    grid-row: 1;
+  }
+
+  .v2 .v2-spread--b .v2-spread__text {
+    --span: 4;
+    grid-column: 1 / span 4;
+    grid-row: 1;
+  }
+  /* where the italic slip line sits (kicker + gap + 1.45 lines of display type) and where on the
+     crop the slip may land: between the eyes and the lips (fraction of the crop's height) */
+  .v2 .v2-spread--b {
+    --slip-y: calc(1.4rem + var(--v2-beat) * 0.6 + var(--v2-fs-dl) * 1.45);
+    --face-f: 0.3;
+  }
+  .v2 .v2-spread--b[data-crop='jaw'] {
+    --face-f: 0.12; /* crop-jaw: no eyes, lips ≈ 35–47 % at the left edge → the cheek above the nose tip */
+  }
+  .v2 .v2-spread--b[data-crop='lips'] {
+    --face-f: 0.25; /* crop-lips: lips ≈ 36–49 %, the left edge is the cheek line → above the lips */
+  }
+  .v2 .v2-spread--b .v2-spread__portrait {
+    --n: 4;
+    grid-column: 5 / span 4;
+    grid-row: 1;
+    align-self: start;
+    /* clamped to the section's top padding: .v2-cv (content-visibility) paint-contains the section */
+    margin-top: max(
+      calc(var(--v2-beat) * -2.4),
+      calc(var(--slip-y) - min(var(--v2-col-w) * var(--n) + var(--v2-gutter) * (var(--n) - 1), 594px) * 1.25 * var(--face-f))
+    );
+    /* not sticky: a sticky portrait would slide under the slip and let it cross the eyes (§4.3) */
+  }
+  /* the overlap: line 2 crosses the portrait edge by ≤ 1.5 columns, on a paper slip */
+  .v2 .v2-spread--b .v2-spread__h {
+    position: relative;
+    z-index: 3;
+  }
+  .v2 .v2-spread--b .v2-spread__slip {
+    padding: 0.04em 0.18em 0.1em;
+    background: var(--v2-paper);
+    box-shadow: var(--v2-shadow-slip);
+  }
+  .v2 .v2-spread--b .v2-spread__slip .v2-spread__under {
+    left: 0.18em;
+    width: calc(100% - 0.36em) !important;
+    bottom: 0.02em;
+  }
+  .v2 .v2-spread--b .v2-spread__h .v2-line--italic {
+    margin-top: 0.06em;
+    text-align: right;
+    margin-right: calc(-1 * (var(--v2-col-w) * 0.55 + var(--v2-gutter)));
+  }
+  /* only the body paragraph wraps the print; the lists and prices start below it (review round 2:
+     wrapped bullets stepped along the curve and «РЕЗУЛЬТАТ» was stranded under the print) */
+  .v2 .v2-spread--b .v2-spread__float {
+    float: left;
+    width: 34%;
+    margin: 0.35em 1.5rem 0.75rem 0;
+  }
+  .v2 .v2-spread--b .v2-spread__lists,
+  .v2 .v2-spread--b .v2-spread__prices {
+    clear: left;
+  }
+}
+
+/* ── ≥ 1280 (12 cols): the full desktop composition ──────────────────────────────────────── */
+@media (min-width: 1280px) {
+  .v2 .v2-spread--a .v2-spread__collage {
+    grid-column: 1 / span 7;
+    justify-self: start;
+    width: fit-content;
+  }
+  .v2 .v2-spread--a .v2-spread__portrait {
+    width: calc(var(--v2-col-w) * 6 + var(--v2-gutter) * 5);
+  }
+  /* the collage move: the print overlaps ≈ 22 % of the portrait (chin / jaw, never the lips) and
+     overhangs it by a column */
+  .v2 .v2-spread--a .v2-spread__print--a {
+    width: calc(var(--v2-col-w) * 2.5 + var(--v2-gutter) * 2);
+    right: calc(-1 * (var(--v2-col-w) + var(--v2-gutter)));
+    bottom: calc(var(--v2-beat) * -1);
+  }
+  .v2 .v2-spread--a .v2-spread__text {
+    --span: 5;
+    grid-column: 8 / span 5;
+  }
+
+  .v2 .v2-spread--b .v2-spread__text {
+    --span: 6;
+    grid-column: 1 / span 6;
+  }
+  .v2 .v2-spread--b .v2-spread__portrait {
+    --n: 6;
+    grid-column: 7 / span 6;
+  }
+  .v2 .v2-spread--b .v2-spread__h .v2-line--italic {
+    margin-right: calc(-1 * (var(--v2-col-w) * 0.9 + var(--v2-gutter)));
+  }
+  .v2 .v2-spread--b .v2-spread__float {
+    width: 40%;
+  }
+  .v2 .v2-spread--b .v2-spread__portrait {
+    justify-self: start; /* capped at 594 px: stay against the text so the slip still crosses it */
+  }
+
+  .v2 .v2-spread--c .v2-spread__head {
+    grid-column: 2 / span 10;
+  }
+  .v2 .v2-spread--c .v2-spread__strip {
+    grid-column: 3 / span 8;
+  }
+  .v2 .v2-spread--c .v2-spread__portrait {
+    width: 32%;
+  }
+  .v2 .v2-spread__print--c {
+    width: 56%;
+  }
+
+  .v2 .v2-spread--c .v2-spread__text {
+    grid-column: 3 / span 8;
+  }
+}
+
+/* phones: Spread C's ghost leaves the headline for the strip's top right (after the C base rules) */
+@media (max-width: 767.98px) {
+  .v2 .v2-spread--c .v2-spread__ghost {
+    top: calc(100% + var(--v2-beat) * 0.4);
+    right: -0.04em;
+    font-size: min(45vw, 15rem);
+  }
+}

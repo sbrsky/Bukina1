@@ -1,0 +1,156 @@
+/* Letter «От автора» — DESIGN.md §5.7. PAGE-B-owned. Prefix .v2-letter__ */
+
+.v2 .v2-letter__grid {
+  align-items: start;
+}
+.v2 .v2-letter__col {
+  --span: var(--v2-cols);
+  --text-w: calc(var(--v2-col-w) * var(--span) + var(--v2-gutter) * (var(--span) - 1));
+  grid-column: 1 / -1;
+}
+.v2 .v2-letter__kicker {
+  margin-bottom: calc(var(--v2-beat) * 0.6);
+}
+.v2 .v2-letter__name {
+  font-size: min(var(--v2-fs-dl), calc(var(--text-w) / (var(--chars, 9) * 0.56)));
+  margin-bottom: calc(var(--v2-beat) * 0.8);
+}
+.v2 .v2-letter__name .v2-line + .v2-line {
+  padding-left: 0.9em; /* staircase: the surname steps in */
+}
+.v2 .v2-letter__quote {
+  max-width: 24ch;
+  margin: 0 0 calc(var(--v2-beat) * 1.1);
+}
+.v2 .v2-letter__quote p {
+  text-wrap: pretty;
+  hyphens: manual;
+}
+
+.v2 .v2-letter__flow {
+  display: flow-root;
+}
+
+/* portrait: the seed blob. Mobile: 70vw, aligned right, no float (§5.7) */
+.v2 .v2-letter__portrait {
+  position: relative;
+  z-index: 1;
+  width: 70vw;
+  max-width: 420px;
+  margin: 0 0 calc(var(--v2-beat) * 0.9) auto;
+  border-radius: var(--shape);
+}
+.v2 .v2-letter__mask {
+  aspect-ratio: 4 / 5;
+  background: var(--v2-blush);
+}
+.v2 .v2-letter__mask img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 18%;
+}
+
+.v2 .v2-letter__body > p {
+  max-width: 60ch;
+  font-size: clamp(1.0625rem, 0.55vw + 0.95rem, 1.375rem);
+  line-height: 1.6;
+}
+.v2 .v2-letter__body > p + p {
+  margin-top: 1em;
+}
+/* the 4-line drop cap must not reach into the next paragraph when the first one is short */
+.v2 .v2-letter__body > p:first-child {
+  min-height: 6.4em;
+}
+/* drop cap: initial-letter 4 in NSD 400; fallback = a 4-line float */
+.v2 .v2-letter__body > p:first-child::first-letter {
+  float: left;
+  margin: 0.06em 0.1em 0 0;
+  font-family: var(--v2-font-display);
+  font-weight: 400;
+  font-stretch: 80%;
+  font-size: 5.3em;
+  line-height: 0.8;
+  color: var(--v2-ink);
+}
+@supports (initial-letter: 4) or (-webkit-initial-letter: 4) {
+  .v2 .v2-letter__body > p:first-child::first-letter {
+    float: none;
+    margin: 0 0.14em 0 0;
+    font-size: inherit;
+    line-height: inherit;
+    -webkit-initial-letter: 4;
+    initial-letter: 4;
+  }
+}
+
+.v2 .v2-letter__foot {
+  margin-top: calc(var(--v2-beat) * 0.9);
+}
+.v2 .v2-letter__creds {
+  color: var(--v2-ink-60);
+}
+.v2 .v2-letter__creds li + li {
+  margin-top: 0.35rem;
+}
+.v2 .v2-letter__creds--foot li::before {
+  content: '※ ';
+  color: var(--v2-rouge);
+}
+.v2 .v2-letter__signwrap {
+  margin: calc(var(--v2-beat) * 0.7) 0 calc(var(--v2-beat) * 0.3);
+}
+.v2 .v2-letter__sign {
+  font-size: 34px;
+  rotate: -3deg;
+  transform-origin: 0 50%;
+}
+
+@media (min-width: 768px) {
+  .v2 .v2-letter__col {
+    --span: 7;
+    grid-column: 1 / span 7;
+  }
+  .v2 .v2-letter__portrait {
+    width: 46%;
+    max-width: none;
+  }
+}
+
+/* ≥ 1024: the portrait floats inside the column; the body wraps around the blob edge (§4.4) */
+@media (min-width: 1024px) {
+  .v2 .v2-letter__portrait {
+    float: left;
+    width: 42%;
+    margin: 0.4em 0 0.6em 0;
+    shape-outside: border-box;
+    shape-margin: 1.5rem;
+  }
+  .v2 .v2-letter__body,
+  .v2 .v2-letter__foot {
+    max-width: none;
+  }
+}
+
+@media (min-width: 1280px) {
+  .v2 .v2-letter__col {
+    --span: 8;
+    grid-column: 3 / span 8;
+  }
+  .v2 .v2-letter__name .v2-line + .v2-line {
+    padding-left: calc(var(--v2-col-w) + var(--v2-gutter));
+  }
+  .v2 .v2-letter__quote {
+    margin-left: calc(var(--v2-col-w) + var(--v2-gutter));
+  }
+  /* marginalia rail (outer edge, right on this heavy-left section) */
+  .v2 .v2-letter__rail {
+    grid-column: 11 / span 2;
+    grid-row: 1;
+    align-self: center;
+    margin-top: calc(var(--v2-beat) * 4);
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--v2-hair);
+  }
+}

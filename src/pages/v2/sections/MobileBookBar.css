@@ -1,0 +1,37 @@
+/* MobileBookBar (DESIGN.md §5.12) — PAGE-A. Phones only; main keeps 88 px clear below (v2.css). */
+
+.v2 .v2-bar {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  z-index: var(--v2-z-bar);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 56px;
+  padding: 6px;
+  background: var(--v2-paper);
+  border-radius: var(--v2-r-slip);
+  box-shadow: var(--v2-shadow-slip);
+}
+.v2 .v2-bar__pill {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 44px;
+  padding-inline: 1em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.v2 .v2-bar__call {
+  flex: none;
+}
+.v2 .v2-bar__call:hover {
+  background: var(--v2-glaze);
+}
+
+@media (min-width: 768px) {
+  .v2 .v2-bar {
+    display: none;
+  }
+}

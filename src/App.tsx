@@ -20,7 +20,7 @@ const AboutPage      = lazy(() => import("./pages/AboutPage"));
 const BookingPage       = lazy(() => import("./pages/BookingPage"));
 const BookingCancelPage = lazy(() => import("./pages/BookingCancelPage"));
 const ComingSoon     = lazy(() => import("./pages/ComingSoon"));
-const HomeV2         = lazy(() => import("./pages/HomeV2"));
+const HomeV2         = lazy(() => import("./pages/v2/HomeV2"));
 const HomeV3         = lazy(() => import("./pages/HomeV3"));
 const PrivacyPolicy  = lazy(() => import("./pages/legal/PrivacyPolicy"));
 const TermsOfService = lazy(() => import("./pages/legal/TermsOfService"));

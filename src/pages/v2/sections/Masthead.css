@@ -1,0 +1,363 @@
+/* Masthead + «Содержание» menu (DESIGN.md §5.1) — PAGE-A */
+
+/* anchor targets clear the sticky bar when it is shown (jumping UP re-reveals the header) */
+.v2 .v2-main [id] {
+  scroll-margin-top: calc(var(--v2-header-h) + 8px);
+}
+
+.v2 .v2-mast {
+  position: sticky;
+  top: 0;
+  z-index: var(--v2-z-header);
+  height: var(--v2-header-h);
+  padding-inline: var(--v2-edge);
+  background: var(--v2-paper);
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--v2-d2) var(--v2-ease-out-soft);
+}
+.v2 .v2-mast[data-scrolled] {
+  border-bottom-color: var(--v2-hair);
+}
+.v2 .v2-mast__grid {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* wordmark «SKINLAB» + micro-line */
+.v2 .v2-mast__brand {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  min-height: 44px;
+  min-width: 0;
+  color: var(--v2-ink);
+}
+.v2 .v2-mast__word {
+  font-family: var(--v2-font-display);
+  font-size: 22px;
+  font-weight: 600;
+  font-stretch: 100%;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  font-synthesis: none;
+}
+.v2 .v2-mast__tag {
+  display: none;
+  font-family: var(--v2-font-mono);
+  font-size: var(--v2-fs-mono-deco);
+  font-weight: 450;
+  font-stretch: 87.5%;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  color: var(--v2-ink-60);
+  white-space: nowrap;
+}
+
+/* inline nav (≥ 1280 only) */
+.v2 .v2-mast__nav {
+  display: none;
+}
+.v2 .v2-mast__nav ul {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.v2 .v2-mast__link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-family: var(--v2-font-mono);
+  font-size: var(--v2-fs-mono);
+  font-weight: 450;
+  font-stretch: 87.5%;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--v2-ink);
+  transition: color var(--v2-d1) var(--v2-ease-out-soft);
+}
+.v2 .v2-mast__link:hover,
+.v2 .v2-mast__link[aria-current='true'] {
+  color: var(--v2-rouge);
+}
+.v2 .v2-mast__ul {
+  position: absolute;
+  left: 0;
+  right: 0.1em;
+  bottom: 6px;
+}
+
+.v2 .v2-mast__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* language toggles (bar + menu) — buttons carry data-v2-lang (v2-shot --lang) */
+.v2 .v2-langs {
+  display: flex;
+  align-items: center;
+}
+.v2 .v2-langs__sep {
+  font-family: var(--v2-font-mono);
+  font-size: var(--v2-fs-mono);
+  color: var(--v2-ink-60);
+}
+.v2 .v2-langs__btn {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  min-width: 40px;
+  min-height: 44px;
+  padding-inline: 2px;
+  font-family: var(--v2-font-mono);
+  font-size: var(--v2-fs-mono);
+  font-weight: 450;
+  font-stretch: 87.5%;
+  letter-spacing: 0.1em;
+  color: var(--v2-ink);
+  border-radius: var(--v2-r-slip);
+}
+.v2 .v2-langs__btn:hover {
+  color: var(--v2-rouge);
+}
+.v2 .v2-langs__btn[aria-pressed='true'] {
+  color: var(--v2-rouge);
+  font-weight: 600;
+}
+.v2 .v2-langs__ul {
+  position: absolute;
+  left: 8px;
+  right: 7px;
+  bottom: 7px;
+}
+.v2 .v2-mast__langs {
+  display: none;
+}
+
+/* pill: 40 px visual on phones with a 44 px hit area */
+.v2 .v2-mast__pill {
+  position: relative;
+  min-height: 40px;
+  padding-inline: 1.05em;
+}
+.v2 .v2-mast__pill::after {
+  content: '';
+  position: absolute;
+  inset: -2px 0;
+}
+
+/* menu button «Содержание» */
+.v2 .v2-mast__menubtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+  min-width: 44px;
+  min-height: 44px;
+  padding-inline: 0.35em;
+  margin-inline-end: -0.35em;
+  font-family: var(--v2-font-mono);
+  font-size: var(--v2-fs-mono);
+  font-weight: 450;
+  font-stretch: 87.5%;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--v2-ink);
+  border-radius: var(--v2-r-pill);
+}
+.v2 .v2-mast__menubtn:hover {
+  color: var(--v2-rouge);
+}
+.v2 .v2-mast__menulabel,
+.v2 .v2-menu__closelabel {
+  /* visually hidden on phones (icon only; still the accessible name) */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .v2 .v2-mast__tag {
+    display: block;
+  }
+  .v2 .v2-mast__langs {
+    display: flex;
+    margin-inline-end: 8px;
+  }
+  .v2 .v2-mast__pill {
+    min-height: 44px;
+    padding-inline: 1.5em;
+  }
+  .v2 .v2-mast__pill::after {
+    content: none;
+  }
+  .v2 .v2-mast__actions {
+    gap: 12px;
+  }
+  .v2 .v2-mast__menulabel,
+  .v2 .v2-menu__closelabel {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+  }
+}
+
+@media (min-width: 1280px) {
+  .v2 .v2-mast__grid {
+    display: grid;
+    grid-template-columns: repeat(var(--v2-cols), minmax(0, 1fr));
+    column-gap: var(--v2-gutter);
+  }
+  .v2 .v2-mast__brand {
+    grid-column: 1 / span 3;
+    justify-self: start;
+  }
+  .v2 .v2-mast__nav {
+    display: block;
+    grid-column: 4 / span 6;
+    padding-inline: calc(var(--v2-col-w) * 0.5);
+  }
+  .v2 .v2-mast__actions {
+    grid-column: 10 / span 3;
+  }
+  .v2 .v2-mast__menubtn {
+    display: none;
+  }
+}
+
+/* ── menu overlay ────────────────────────────────────────────────────────────────────────── */
+.v2 .v2-menu {
+  position: fixed;
+  inset: 0;
+  z-index: var(--v2-z-menu);
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--v2-edge) calc(var(--v2-beat) + env(safe-area-inset-bottom));
+  background: var(--v2-paper);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.v2 .v2-menu::after {
+  /* the page grain continues on the overlay */
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: var(--v2-grain);
+  background-size: 256px 256px;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+}
+.v2 .v2-menu__top {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--v2-header-h);
+  border-bottom: 1px solid var(--v2-hair);
+}
+.v2 .v2-menu__nav {
+  flex: 1 0 auto;
+  padding-block: calc(var(--v2-beat) * 1.2) var(--v2-beat);
+}
+.v2 .v2-menu__list > li:nth-child(3n + 2) {
+  margin-inline-start: 8%;
+}
+.v2 .v2-menu__list > li:nth-child(3n + 3) {
+  margin-inline-start: 4%;
+}
+.v2 .v2-menu__link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  min-height: 44px;
+  padding-block: 0.35rem;
+  color: var(--v2-ink);
+}
+.v2 .v2-menu__num {
+  font-family: var(--v2-font-mono);
+  font-size: var(--v2-fs-mono-deco);
+  font-weight: 500;
+  font-stretch: 87.5%;
+  letter-spacing: 0.06em;
+  color: var(--v2-rouge);
+  translate: 0 -0.9em;
+}
+.v2 .v2-menu__label {
+  font-family: var(--v2-font-display);
+  font-size: 40px;
+  font-weight: 400;
+  font-stretch: 75%;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  font-synthesis: none;
+  background-image: linear-gradient(var(--v2-rouge), var(--v2-rouge));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 2px;
+  transition: background-size var(--v2-d2) var(--v2-ease-out);
+}
+.v2 .v2-menu__link:is(:hover, :focus-visible) .v2-menu__label,
+.v2 .v2-menu__link[aria-current='true'] .v2-menu__label {
+  background-size: 100% 2px;
+}
+.v2:lang(lv) .v2-menu__label {
+  line-height: 1.12;
+}
+.v2 .v2-menu__foot {
+  flex: none;
+  display: grid;
+  gap: calc(var(--v2-beat) * 0.6);
+  justify-items: start;
+  padding-top: var(--v2-beat);
+  border-top: 1px solid var(--v2-hair);
+}
+.v2 .v2-menu__langs {
+  margin-inline-start: -8px;
+}
+.v2 .v2-menu__contacts {
+  display: grid;
+  gap: 2px;
+  font-style: normal;
+  font-family: var(--v2-font-mono);
+  font-size: var(--v2-fs-mono);
+  font-weight: 450;
+  font-stretch: 87.5%;
+  letter-spacing: 0.06em;
+  color: var(--v2-ink-60);
+}
+.v2 .v2-menu__phone {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--v2-ink);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+@media (min-width: 768px) {
+  .v2 .v2-menu__label {
+    font-size: clamp(40px, 5.6vw, 64px);
+  }
+  .v2 .v2-menu__foot {
+    grid-template-columns: auto auto 1fr;
+    align-items: center;
+    column-gap: calc(var(--v2-beat) * 1.2);
+  }
+  .v2 .v2-menu__contacts {
+    justify-self: end;
+    text-align: end;
+  }
+}

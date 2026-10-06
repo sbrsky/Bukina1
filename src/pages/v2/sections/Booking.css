@@ -1,0 +1,176 @@
+/* Booking «Запишитесь» — DESIGN.md §5.10. PAGE-B-owned. Ink section; prefix .v2-booking__ */
+
+.v2 .v2-booking__grid {
+  position: relative;
+  z-index: 1; /* above the .v2-on-ink grain layer */
+  align-items: start;
+}
+
+/* giant: paper display lines at --v2-fs-h1 × .8 */
+.v2 .v2-booking__h {
+  --span: var(--v2-cols);
+  --text-w: calc(var(--v2-col-w) * var(--span) + var(--v2-gutter) * (var(--span) - 1));
+  grid-column: 1 / -1;
+  font-family: var(--v2-font-display);
+  font-synthesis: none;
+  font-size: min(var(--v2-fs-h1), calc(var(--text-w) / (var(--chars, 14) * 0.5)));
+  font-weight: 380;
+  font-stretch: 66%;
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  color: var(--v2-paper);
+  margin-bottom: calc(var(--v2-beat) * 1.5);
+}
+.v2 .v2-booking__h .v2-line--italic {
+  font-weight: 340;
+  padding-left: 0.5em;
+}
+.v2:lang(lv) .v2-booking__h {
+  line-height: 1;
+  padding-block-start: 0.06em;
+}
+
+.v2 .v2-booking__info {
+  grid-column: 1 / -1;
+}
+.v2 .v2-booking__sub {
+  max-width: 34ch;
+  margin-bottom: calc(var(--v2-beat) * 0.8);
+  font-size: var(--v2-fs-body);
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--v2-paper) 80%, transparent);
+}
+.v2 .v2-booking__cta {
+  margin-bottom: calc(var(--v2-beat) * 1.2);
+}
+.v2 .v2-booking__pill {
+  min-height: 52px;
+  padding-inline: 1.75em;
+}
+
+.v2 .v2-booking__facts {
+  display: grid;
+  gap: calc(var(--v2-beat) * 0.6);
+  margin: 0;
+}
+.v2 .v2-booking__fact {
+  display: grid;
+  align-content: start;
+  gap: 0.35rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid color-mix(in srgb, var(--v2-paper) 16%, transparent);
+}
+.v2 .v2-booking__dt {
+  font-family: var(--v2-font-mono);
+  font-size: var(--v2-fs-mono);
+  font-weight: 450;
+  font-stretch: 87.5%;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--v2-paper) 70%, transparent);
+}
+.v2 .v2-booking__dd {
+  margin: 0;
+  hyphens: manual; /* short facts wrap at word boundaries («По предварительной / записи») */
+  -webkit-hyphens: manual;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-size: 17px;
+  line-height: 1.45;
+  color: var(--v2-paper);
+}
+.v2 .v2-booking__line + .v2-booking__line {
+  margin-top: 0.15rem;
+}
+.v2 .v2-booking__phone {
+  font-family: var(--v2-font-mono);
+  font-size: 18px;
+  font-weight: 600;
+  font-stretch: 87.5%;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.v2 .v2-booking__ph {
+  display: inline-block;
+  width: 11ch;
+  height: 44px;
+}
+.v2 .v2-booking__mail {
+  font-weight: 400;
+  min-height: 44px;
+}
+.v2 .v2-on-ink .v2-booking__dd .v2-link {
+  color: var(--v2-paper);
+  background-position: 0 calc(100% - 9px);
+}
+.v2 .v2-booking__addr {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.6rem;
+}
+.v2 .v2-booking__pin {
+  width: 18px;
+  height: 23px;
+  flex: none;
+  fill: none;
+  stroke: var(--v2-rouge);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  rotate: -8deg;
+}
+.v2 .v2-booking__socials {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0 1.25rem;
+}
+.v2 .v2-booking__net {
+  font-family: var(--v2-font-mono);
+  font-size: var(--v2-fs-mono);
+  font-weight: 450;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--v2-paper) 70%, transparent);
+}
+
+/* phones: stacked, the pill full width; the ink runs on under main's 88 px sticky-bar padding */
+@media (max-width: 767.98px) {
+  .v2 .v2-booking {
+    margin-bottom: -88px;
+    padding-bottom: calc(var(--v2-beat) * 2.5 + 88px);
+  }
+  .v2 .v2-booking__pill {
+    display: flex;
+    width: 100%;
+  }
+}
+
+@media (min-width: 768px) {
+  .v2 .v2-booking__h {
+    --span: 8;
+  }
+  .v2 .v2-booking__info {
+    grid-column: 4 / span 5;
+  }
+  .v2 .v2-booking__facts {
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--v2-gutter);
+  }
+}
+
+/* ≥ 1280 (review round 2): the facts column starts level with the headline's first cap height
+   instead of under it (≈ 500 px of empty ink on the left) — headline cols 1–7, facts cols 9–12 */
+@media (min-width: 1280px) {
+  .v2 .v2-booking__h {
+    --span: 7;
+    grid-column: 1 / span 7;
+    grid-row: 1;
+    margin-bottom: 0;
+  }
+  .v2 .v2-booking__info {
+    grid-column: 9 / span 4;
+    grid-row: 1;
+    /* the display line box (lh .92) puts the cap top ≈ 12–16 px under the box top */
+    margin-top: 14px;
+  }
+}

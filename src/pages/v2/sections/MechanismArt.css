@@ -1,0 +1,113 @@
+/* MechanismArt (DESIGN.md §5.5) — PAGE-A. Token colours only; strokes keep the film's weights. */
+
+.v2 .v2-mech {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* grounds */
+.v2 .v2-mech__oat {
+  fill: var(--v2-oat);
+}
+
+/* PDRN → collagen */
+.v2 .v2-mech__strand {
+  fill: none;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.v2 .v2-mech__strand--plum {
+  stroke: var(--v2-plum);
+}
+.v2 .v2-mech__strand--rouge {
+  stroke: var(--v2-rouge);
+}
+.v2 .v2-mech__rung {
+  fill: none;
+  stroke: var(--v2-ink-60);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.v2 .v2-mech__fibre {
+  fill: none;
+  stroke: color-mix(in srgb, var(--v2-blush) 55%, var(--v2-plum));
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+.v2 .v2-mech__arrow {
+  fill: none;
+  stroke: var(--v2-rouge);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* droplet + plumping cells — pencil line work (rouge + ink, 2–2.5 px, no gloss) */
+.v2 .v2-mech__cell {
+  fill: color-mix(in srgb, var(--v2-blush) 22%, transparent);
+  stroke: var(--v2-rouge);
+  stroke-width: 2.2;
+  stroke-linejoin: round;
+}
+.v2 .v2-mech__cellcore {
+  fill: none;
+  stroke: var(--v2-ink-60);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.v2 .v2-mech__ripple {
+  fill: none;
+  stroke-linecap: round;
+}
+.v2 .v2-mech__ripple--ink {
+  stroke: var(--v2-ink-60);
+  stroke-width: 1.8;
+  stroke-dasharray: 5 6;
+}
+.v2 .v2-mech__ripple--rouge {
+  stroke: var(--v2-rouge);
+  stroke-width: 2;
+}
+.v2 .v2-mech__droprim {
+  fill: none;
+  stroke: var(--v2-rouge);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+.v2 .v2-mech__dropline {
+  fill: none;
+  stroke: var(--v2-rouge);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+/* clippings «пилинг + мезо + маска» */
+.v2 .v2-mech__clip {
+  fill: var(--v2-glaze);
+  stroke: color-mix(in srgb, var(--v2-plum) 12%, transparent);
+  stroke-width: 0.6;
+}
+.v2 .v2-mech__clipshadow {
+  fill: color-mix(in srgb, var(--v2-plum) 9%, transparent);
+}
+.v2 .v2-mech__cliptext {
+  font-family: var(--v2-font-text);
+  font-size: 19px;
+  font-weight: 600;
+  fill: var(--v2-ink);
+}
+.v2 .v2-mech__tape {
+  fill: var(--v2-oat);
+  opacity: 0.85;
+  stroke: color-mix(in srgb, var(--v2-plum) 10%, transparent);
+  stroke-width: 0.5;
+}
+.v2 .v2-mech__plus {
+  font-family: var(--v2-font-display);
+  font-size: 46px;
+  font-weight: 500;
+  fill: var(--v2-rouge);
+}

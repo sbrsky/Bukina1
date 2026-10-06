@@ -1,0 +1,53 @@
+/* NextSlotChip (DESIGN.md §5.2.2) — PAGE-A */
+
+.v2 .v2-slot {
+  min-height: 44px; /* reserved before the slot arrives (no CLS); also the tap-target height */
+  display: flex;
+  align-items: center;
+}
+@media (max-width: 479.98px) {
+  .v2 .v2-slot {
+    min-height: 64px; /* the chip wraps onto two lines on phones — reserve both */
+  }
+}
+.v2 .v2-slot__chip {
+  display: inline-flex;
+  align-items: flex-start; /* a wrapped label keeps its bullet on the first line */
+  gap: 0.6em;
+  min-height: 40px;
+  padding: 0.45em 0.9em;
+  font-family: var(--v2-font-mono);
+  font-size: var(--v2-fs-mono);
+  font-weight: 450;
+  font-stretch: 87.5%;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.35;
+  font-variant-numeric: tabular-nums;
+  hyphens: none;
+  text-wrap: balance;
+  transition:
+    background-color var(--v2-d1) var(--v2-ease-out-soft),
+    box-shadow var(--v2-d2) var(--v2-ease-out);
+}
+.v2 .v2-slot__chip:hover {
+  background: var(--v2-glaze);
+}
+.v2 .v2-slot__dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  margin-top: calc(0.675em - 3.5px); /* centred on the first line (line-height 1.35) */
+  border-radius: 50%;
+  background: var(--v2-rouge);
+}
+.v2 .v2-slot__label {
+  color: var(--v2-ink-60);
+}
+.v2 .v2-slot__value {
+  color: var(--v2-ink);
+  font-weight: 600;
+}
+.v2 .v2-slot__chip:focus-visible {
+  box-shadow: var(--v2-shadow-slip), var(--v2-focus);
+}

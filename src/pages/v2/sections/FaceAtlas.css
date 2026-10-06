@@ -1,0 +1,265 @@
+/* FaceAtlas (DESIGN.md §5.4) — PAGE-A. Heavy right: the portrait; the card is the index slip. */
+
+.v2 .v2-atlas {
+  contain-intrinsic-size: auto 1300px;
+}
+.v2 .v2-atlas__grid > * {
+  grid-column: 1 / -1;
+}
+
+/* headline */
+.v2 .v2-atlas__kicker {
+  margin-bottom: calc(var(--v2-beat) * 0.5);
+}
+.v2 .v2-atlas__head {
+  position: relative;
+  z-index: var(--v2-z-overlap);
+}
+.v2 .v2-atlas__hline--2 {
+  margin-inline-start: 8%;
+}
+
+/* ── portrait: blush hero blob + cut-out face + marks + hotspots ─────────────────────────── */
+.v2 .v2-atlas__portrait {
+  position: relative;
+  margin-top: var(--v2-beat);
+}
+.v2 .v2-atlas__blob {
+  position: absolute;
+  inset: 14% 2% 3% 7%;
+  background: var(--v2-blush);
+}
+.v2 .v2-atlas__face {
+  position: relative;
+  aspect-ratio: 1031 / 1280;
+  width: 100%;
+}
+.v2 .v2-atlas__face picture,
+.v2 .v2-atlas__face img {
+  width: 100%;
+  height: 100%;
+}
+/* the cut-out ends at the shoulders: fade that edge into the paper (static mask, no hard crop) */
+.v2 .v2-atlas__face picture {
+  -webkit-mask-image:
+    radial-gradient(ellipse 64% 84% at 50% 36%, black 74%, transparent 100%),
+    linear-gradient(to bottom, black 82%, transparent 99%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    radial-gradient(ellipse 64% 84% at 50% 36%, black 74%, transparent 100%),
+    linear-gradient(to bottom, black 82%, transparent 99%);
+  mask-composite: intersect;
+}
+.v2 .v2-atlas__mark {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+/* ≈ 2.5 px on screen at every size (viewBox units: 1031 px wide source) */
+.v2 .v2-atlas__mark path {
+  stroke-width: 7.5;
+}
+
+.v2 .v2-atlas__spots {
+  position: absolute;
+  inset: 0;
+}
+.v2 .v2-atlas__spot {
+  position: absolute;
+  translate: -50% -50%;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--v2-paper);
+  box-shadow:
+    inset 0 0 0 2px var(--v2-rouge),
+    0 6px 14px -6px color-mix(in srgb, var(--v2-plum) 40%, transparent);
+  color: var(--v2-ink);
+  font-family: var(--v2-font-mono);
+  font-size: var(--v2-fs-mono);
+  font-weight: 600;
+  font-stretch: 87.5%;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  transition:
+    background-color var(--v2-d1) var(--v2-ease-out-soft),
+    color var(--v2-d1) var(--v2-ease-out-soft),
+    scale var(--v2-d2) var(--v2-ease-out);
+}
+.v2 button.v2-atlas__spot:hover {
+  scale: 1.08;
+}
+.v2 .v2-atlas__spot[aria-selected='true'],
+.v2 .v2-atlas__spot[data-selected] {
+  background: var(--v2-rouge);
+  color: var(--v2-glaze);
+}
+.v2 button.v2-atlas__spot:focus-visible {
+  box-shadow:
+    inset 0 0 0 2px var(--v2-rouge),
+    var(--v2-focus);
+}
+/* phones: small decorative markers (the chips are the tabs) */
+.v2 .v2-atlas__spot--marker {
+  width: 26px;
+  height: 26px;
+  font-size: var(--v2-fs-mono-deco);
+  box-shadow: inset 0 0 0 1.5px var(--v2-rouge);
+  pointer-events: none;
+}
+
+/* ── phone chip tabs: wrap onto 2 rows, never a horizontal scroller ─────────────────────── */
+.v2 .v2-atlas__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: calc(var(--v2-beat) * 0.75);
+}
+.v2 .v2-atlas__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  min-height: 44px;
+  padding: 0 0.95em;
+  border-radius: var(--v2-r-pill);
+  background: var(--v2-oat);
+  color: var(--v2-ink);
+  font-family: var(--v2-font-mono);
+  font-size: var(--v2-fs-mono);
+  font-weight: 450;
+  font-stretch: 87.5%;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.v2 .v2-atlas__chipn {
+  color: var(--v2-rouge);
+  font-weight: 600;
+}
+.v2 .v2-atlas__chip[aria-selected='true'] {
+  background: var(--v2-ink);
+  color: var(--v2-paper);
+}
+.v2 .v2-atlas__chip[aria-selected='true'] .v2-atlas__chipn {
+  color: var(--v2-blush);
+}
+
+/* ── the index card (tabpanel) ───────────────────────────────────────────────────────────── */
+.v2 .v2-atlas__cardwrap {
+  margin-top: calc(var(--v2-beat) * 0.6); /* phones: the card follows the chips closely */
+}
+.v2 .v2-atlas__card {
+  position: relative;
+  padding: calc(var(--v2-beat) * 0.9) clamp(18px, 2.4vw, 36px) calc(var(--v2-beat) * 0.8);
+  background: var(--v2-oat);
+  border-radius: var(--v2-r-slip);
+  box-shadow: var(--v2-shadow-print);
+}
+.v2 .v2-atlas__card:focus-visible {
+  box-shadow:
+    var(--v2-shadow-print),
+    var(--v2-focus);
+}
+.v2 .v2-atlas__zone {
+  color: var(--v2-rouge);
+}
+.v2 .v2-atlas__ztitle {
+  margin-top: 0.3em;
+  font-family: var(--v2-font-display);
+  font-size: 40px;
+  font-weight: 400;
+  font-stretch: 80%;
+  line-height: 1.02;
+  letter-spacing: -0.015em;
+  font-synthesis: none;
+  text-wrap: balance;
+}
+.v2:lang(lv) .v2-atlas__ztitle {
+  line-height: 1.08;
+}
+.v2 .v2-atlas__concerns {
+  margin-top: 0.6em;
+  font-size: 17px;
+  line-height: 1.45;
+  color: var(--v2-ink);
+}
+.v2 .v2-atlas__rows {
+  margin-top: calc(var(--v2-beat) * 0.6);
+  border-top: 1px solid var(--v2-hair);
+}
+.v2 .v2-atlas__rows li {
+  border-bottom: 1px solid var(--v2-hair);
+}
+.v2 .v2-atlas__row {
+  font-family: var(--v2-font-text);
+  font-size: 16px;
+  line-height: 1.3;
+  color: var(--v2-ink);
+}
+.v2 .v2-atlas__row .v2-leader__price {
+  font-size: 15px;
+}
+.v2 .v2-atlas__row:hover .v2-leader__name {
+  color: var(--v2-rouge);
+}
+
+/* ── ≥ 768: hotspots are the tabs; card beside the portrait ──────────────────────────────── */
+@media (min-width: 768px) {
+  .v2 .v2-atlas__grid {
+    grid-template-rows: auto auto minmax(0, 1fr);
+  }
+  .v2 .v2-atlas__head {
+    grid-row: 1;
+  }
+  .v2 .v2-atlas__portrait {
+    grid-column: 4 / -1;
+    grid-row: 2 / -1;
+  }
+  .v2 .v2-atlas__cardwrap {
+    grid-column: 1 / span 3;
+    grid-row: 2;
+    margin-top: calc(var(--v2-beat) * 2);
+    margin-inline-end: calc(var(--v2-gutter) * -1);
+    position: relative;
+    z-index: var(--v2-z-overlap);
+  }
+  .v2 .v2-atlas__mark path {
+    stroke-width: 4.5;
+  }
+}
+@media (min-width: 1024px) {
+  .v2 .v2-atlas__cardwrap {
+    grid-column: 1 / span 4;
+    margin-inline-end: 0;
+  }
+  .v2 .v2-atlas__portrait {
+    grid-column: 5 / -1;
+  }
+}
+@media (min-width: 1280px) {
+  .v2 .v2-atlas__grid {
+    grid-template-rows: auto auto minmax(0, 1fr);
+  }
+  .v2 .v2-atlas__head {
+    grid-column: 1 / span 7;
+    grid-row: 1;
+    padding-top: calc(var(--v2-beat) * 1.5);
+  }
+  .v2 .v2-atlas__portrait {
+    grid-column: 6 / span 6;
+    grid-row: 1 / -1;
+    margin-top: 0;
+  }
+  .v2 .v2-atlas__cardwrap {
+    grid-column: 1 / span 5;
+    grid-row: 2;
+    margin-top: calc(var(--v2-beat) * 2);
+    max-width: 560px;
+  }
+  .v2 .v2-atlas__mark path {
+    stroke-width: 4;
+  }
+}

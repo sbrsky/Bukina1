@@ -1,0 +1,145 @@
+/* Questions «Частые вопросы» — DESIGN.md §5.9. PAGE-B-owned. Prefix .v2-faq__ */
+
+.v2 .v2-faq__grid {
+  align-items: start;
+}
+.v2 .v2-faq__rail {
+  grid-column: 1 / -1;
+  margin-bottom: calc(var(--v2-beat) * 0.6);
+  color: var(--v2-rouge);
+}
+.v2 .v2-faq__col {
+  --span: var(--v2-cols);
+  --text-w: calc(var(--v2-col-w) * var(--span) + var(--v2-gutter) * (var(--span) - 1));
+  --v2-faq-n: 2.6rem;
+  grid-column: 1 / -1;
+}
+.v2 .v2-faq__h {
+  font-size: min(var(--v2-fs-dl), calc(var(--text-w) / (var(--chars, 10) * 0.56)));
+  margin-bottom: calc(var(--v2-beat) * 1.2);
+}
+.v2 .v2-faq__h .v2-line--italic {
+  padding-left: 0.8em;
+}
+
+.v2 .v2-faq__list {
+  border-bottom: 1px solid var(--v2-hair);
+}
+.v2 .v2-faq__item {
+  border-top: 1px solid var(--v2-hair);
+}
+.v2 .v2-faq__qh {
+  margin: 0;
+}
+.v2 .v2-faq__q {
+  display: grid;
+  grid-template-columns: var(--v2-faq-n) minmax(0, 1fr) 28px;
+  align-items: baseline;
+  gap: 0 0.75rem;
+  width: 100%;
+  min-height: 44px;
+  padding: 1.05rem 0 1.15rem;
+  text-align: left;
+  color: var(--v2-ink);
+}
+.v2 .v2-faq__n {
+  translate: 0 -0.15em;
+}
+.v2 .v2-faq__qt {
+  font-family: var(--v2-font-display);
+  font-size: clamp(1.5rem, 2.4vw, 2.25rem);
+  font-style: italic;
+  font-weight: 300;
+  font-stretch: 85%;
+  line-height: 1.12;
+  letter-spacing: -0.005em;
+  text-wrap: pretty;
+  hyphens: manual;
+  overflow-wrap: break-word;
+  min-width: 0;
+  background-image: linear-gradient(var(--v2-rouge), var(--v2-rouge));
+  background-repeat: no-repeat;
+  background-position: 0 96%;
+  background-size: 0% 1.5px;
+  transition: background-size var(--v2-d2) var(--v2-ease-out);
+}
+.v2 .v2-faq__q:hover .v2-faq__qt {
+  background-size: 100% 1.5px;
+}
+.v2 .v2-faq__plus {
+  align-self: center;
+  width: 28px;
+  height: 28px;
+  fill: none;
+  stroke: var(--v2-rouge);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  transition: rotate var(--v2-d2) var(--v2-ease-out);
+}
+.v2 .v2-faq__item.is-open .v2-faq__plus {
+  rotate: 45deg;
+}
+
+/* answer: grid-template-rows 0fr → 1fr; hidden from AT while collapsed (visibility, delayed) */
+.v2 .v2-faq__a {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--v2-d2) var(--v2-ease-out);
+}
+.v2 .v2-faq__item.is-open .v2-faq__a {
+  grid-template-rows: 1fr;
+}
+.v2 .v2-faq__inner {
+  min-height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  transition: visibility 0s linear var(--v2-d2);
+}
+.v2 .v2-faq__item.is-open .v2-faq__inner {
+  visibility: visible;
+  transition-delay: 0s;
+}
+.v2 .v2-faq__text {
+  padding: 0 0 1.5rem calc(var(--v2-faq-n) + 0.75rem);
+  white-space: pre-line;
+  color: var(--v2-ink);
+  max-width: 64ch;
+}
+
+@media (max-width: 479.98px) {
+  .v2 .v2-faq__col {
+    --v2-faq-n: 2rem;
+  }
+  .v2 .v2-faq__text {
+    padding-left: 0;
+  }
+}
+
+@media (min-width: 768px) {
+  .v2 .v2-faq__rail {
+    grid-column: 1 / span 1;
+    grid-row: 1;
+    margin: 0;
+    justify-self: start;
+    font-size: var(--v2-fs-mono);
+    letter-spacing: 0.3em;
+  }
+  .v2 .v2-faq__col {
+    --span: 7;
+    grid-column: 2 / span 7;
+  }
+  /* no staircase (review round 2): 12–24 px steps read as misaligned hairlines — every hairline
+     starts at one x, numbers in one column; the section's offset is the cols 4–11 column itself */
+}
+
+@media (min-width: 1280px) {
+  .v2 .v2-faq__rail {
+    grid-column: 1 / span 2;
+    position: sticky;
+    top: calc(var(--v2-header-h) + var(--v2-beat));
+  }
+  .v2 .v2-faq__col {
+    --span: 8;
+    grid-column: 4 / span 8;
+  }
+}
